@@ -19,7 +19,7 @@ class ClockifyApp:
         if len(sys.argv) > 1:
             date_to_filter = sys.argv[1]
             if not self.date_to_filter(date_to_filter):
-                print("Invalid date format, please provide the date in the format 'YYYY-MM-DD'")
+                print("Invalid date format, please provide the date in the format 'YYYY-MM-DD.'")
                 return
 
         for data in get_data:
