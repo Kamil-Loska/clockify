@@ -23,7 +23,7 @@ class ClockifyApp:
         date_from = sys.argv[1]
         date_to = sys.argv[2]
 
-        if not self.validate_date_format(date_from) or not self.validate_date_format(date_to):
+        if not self.validate_date_format(date_from, date_to):
             print("Invalid date format. Please provide dates in the format 'YYYY-MM-DD'. ")
             return
 
@@ -90,12 +90,12 @@ class ClockifyApp:
         names = self.send_get_request(endpoint)
         return names['name']
 
-    def validate_date_format(self, date):
+    def validate_date_format(self, first_date, second_date):
         try:
-            first_date = datetime.datetime.strptime(date, '%Y-%m-%d')
-            second_date = datetime.datetime.strptime(sys.argv[2], '%Y-%m-%d')
+            first_date = datetime.datetime.strptime(first_date, '%Y-%m-%d')
+            second_date = datetime.datetime.strptime(second_date, '%Y-%m-%d')
             if first_date > second_date:
-                print("First date can't be less than second one.")
+                print("First date can't be greater than second one.")
             return True
         except ValueError:
             return False
@@ -118,10 +118,10 @@ class ClockifyApp:
                 writer.writeheader()
             writer.writerow(report_data)
 
-            with open(filename, 'r') as csvfile:
-                if csvfile.read().strip() == '':
-                    print(filename)
-                    return
+        with open(filename, 'r') as csvfile:
+            if csvfile.read().strip() == '':
+                print(filename)
+                return
 
 raport = ClockifyApp()
 raport.generate_raport()
