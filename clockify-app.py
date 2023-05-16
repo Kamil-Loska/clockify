@@ -16,11 +16,16 @@ class ClockifyApp:
         user_id = 'USER_ID'
         endpoint = f'workspaces/{workspace_id}/user/{user_id}/time-entries'
         get_data = self.send_get_request(endpoint)
-        if len(sys.argv) > 1:
-            date_to_filter = sys.argv[1]
-            if not self.date_to_filter(date_to_filter):
-                print("Invalid date format, please provide the date in the format 'YYYY-MM-DD.'")
-                return
+
+        if len(sys.argv) != 3:
+            print("Invalid number of arguments. Please provide two dates as arguments")
+            return
+        date_from = sys.argv[1]
+        date_to = sys.argv[2]
+
+        if not self.validate_date_format(date_from) or not self.validate_date_format(date_to):
+            print("Invalid date format. Please provide dates in the format 'YYYY-MM-DD'. ")
+            return
 
         for data in get_data:
             create_date = data['timeInterval']['start'][:10]
@@ -29,7 +34,7 @@ class ClockifyApp:
             if name == "":
                 name = "In progres..."
 
-            if data['userId'] == self.get_user_id() and create_date == sys.argv[1]:
+            if data['userId'] == self.get_user_id() and date_from <= create_date <= date_to:
                 member_name = self.get_name()
 
                 report_data = {
@@ -38,7 +43,7 @@ class ClockifyApp:
                     'Czas trwania': self.format_duration(duration),
                     'Opis zadania': name,
                 }
-                self.create_report(report_data)
+                print(report_data)
 
 
     def format_duration(self, duration):
@@ -85,9 +90,13 @@ class ClockifyApp:
         names = self.send_get_request(endpoint)
         return names['name']
 
-    def date_to_filter(self, date_str):
+    def validate_date_format(self, date):
         try:
-            datetime.datetime.strptime(date_str, '%Y-%m-%d')
+            get_data = datetime.datetime.strptime(date, '%Y-%m-%d')
+            get_days = str(get_data).split("-")
+            day = int(get_days[2].split()[0])
+            if day > int(sys.argv[2].split("-")[2]):
+                print("First date can't be less than second one.")
             return True
         except ValueError:
             return False
