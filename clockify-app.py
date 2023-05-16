@@ -92,10 +92,9 @@ class ClockifyApp:
 
     def validate_date_format(self, date):
         try:
-            get_data = datetime.datetime.strptime(date, '%Y-%m-%d')
-            get_days = str(get_data).split("-")
-            day = int(get_days[2].split()[0])
-            if day > int(sys.argv[2].split("-")[2]):
+            first_date = datetime.datetime.strptime(date, '%Y-%m-%d')
+            second_date = datetime.datetime.strptime(sys.argv[2], '%Y-%m-%d')
+            if first_date > second_date:
                 print("First date can't be less than second one.")
             return True
         except ValueError:
