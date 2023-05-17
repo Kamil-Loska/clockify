@@ -8,13 +8,13 @@ class ClockifyApp:
 
     def __init__(self):
         self.API_KEY = 'API_KEY'
+        self.WORKSPACE_ID = 'WORKSPACE_ID'
+        self.USER_ID = 'USER_ID'
         self.BASE_URL = 'https://api.clockify.me/api/v1/'
 
 
     def get_time_entries_per_user(self, start_date, end_date):
-        workspace_id = 'WORKSPACE_ID'
-        user_id = 'USER_ID'
-        endpoint = f'workspaces/{workspace_id}/user/{user_id}/time-entries?start={start_date}T00:00:00Z&end={end_date}T23:59:59Z'
+        endpoint = f'workspaces/{self.WORKSPACE_ID}/user/{self.USER_ID}/time-entries?start={start_date}T00:00:00Z&end={end_date}T23:59:59Z'
         users_data = self.send_get_request(endpoint)
 
         return users_data
