@@ -1,11 +1,31 @@
+from unittest import mock
+import sys
 import pytest
 from main import ClockifyApp
+
+from unittest.mock import patch
+
 
 class TestClockifyApp:
 
     @pytest.fixture
     def clockify(self):
         return ClockifyApp()
+
+    @pytest.fixture
+    def mock_get_request(self):
+        with patch('main.requests.get') as mock_get:
+            yield mock_get
+
+    @pytest.fixture
+    def mock_send_get_request(self):
+        with patch('main.requests.get') as mock:
+            yield mock
+
+    @pytest.fixture
+    def mock_print(self):
+        with patch('builtins.print') as mock:
+            yield mock
 
     def test_validate_date_format_valid_dates(self, clockify):
         assert clockify.validate_date_format("2023-05-14", "2023-05-16") is True
@@ -41,3 +61,36 @@ class TestClockifyApp:
         assert clockify.format_duration("PT45M") == "45M"
         assert clockify.format_duration("PT30S") == "30S"
 
+    @mock.patch('main.requests.get')
+    def test_send_get_request(self, mock_get_request, clockify):
+        mock_response = mock.MagicMock()
+        expected_response = {'id': '123', 'description': 'Test Result'}
+        mock_response.json.return_value = expected_response
+        mock_get_request.return_value = mock_response
+
+        endpoint = 'test-endpoint'
+        params = {'key': 'value'}
+        result = clockify.send_get_request(endpoint, params=params)
+
+        mock_get_request.assert_called_with(clockify.BASE_URL + endpoint, headers=mock.ANY, params=params)
+
+        assert result == expected_response
+
+    @mock.patch('main.requests.get')
+    def test_generate_raport_iteration_count(self, mock_send_get_request):
+        mock_responses = [
+            [{'data': 'response1'}, {'data': 'response2'}],
+            [{'data': 'response3'}, {'data': 'response4'}, {'data': 'response5'}]
+        ]
+
+        mock_send_get_request.json.side_effect = mock_responses
+
+        clockify = ClockifyApp()
+
+        sys.argv = ['', '2023-05-15', '2023-05-16'] #??
+        clockify.generate_raport()
+
+        expected_iterations = len(mock_responses)
+        actual_iterations = mock_send_get_request.call_count
+
+        assert expected_iterations == actual_iterations
