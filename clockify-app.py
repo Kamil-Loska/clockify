@@ -17,15 +17,25 @@ class ClockifyApp:
             'start': f'{start_date}T00:00:00Z',
             'end': f'{end_date}T23:59:59Z',
         }
-        users_data = self.send_get_request(endpoint, params)
+        all_data = []
+        page = 1
 
-        return users_data
+        while True:
+            params['page'] = page
+            response = self.send_get_request(endpoint, params)
+            data = response
+            all_data.extend(data)
+
+            if len(data) == 0:
+                break
+            page += 1
+
+        return all_data
 
     def generate_raport(self, date_from='', date_to=''):
         if not self.validate_date_format(date_from, date_to):
             print("Invalid date format. Please provide dates in the format 'YYYY-MM-DD'. ")
             return
-
         get_data = self.get_time_entries_per_user(date_from, date_to)
         get_user_id, get_user_name = self.get_user_data()
 

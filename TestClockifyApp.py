@@ -17,16 +17,6 @@ class TestClockifyApp:
         with patch('main.requests.get') as mock_get:
             yield mock_get
 
-    @pytest.fixture
-    def mock_send_get_request(self):
-        with patch('main.requests.get') as mock:
-            yield mock
-
-    @pytest.fixture
-    def mock_print(self):
-        with patch('builtins.print') as mock:
-            yield mock
-
     def test_validate_date_format_valid_dates(self, clockify):
         assert clockify.validate_date_format("2023-05-14", "2023-05-16") is True
         assert clockify.validate_date_format("2023-01-01", "2023-12-12") is True
@@ -84,11 +74,8 @@ class TestClockifyApp:
         ]
 
         mock_send_get_request.json.side_effect = mock_responses
-
         clockify = ClockifyApp()
-
-        sys.argv = ['', '2023-05-15', '2023-05-16'] #??
-        clockify.generate_raport()
+        clockify.generate_raport('2023-05-15', '2023-05-16')
 
         expected_iterations = len(mock_responses)
         actual_iterations = mock_send_get_request.call_count
