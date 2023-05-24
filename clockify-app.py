@@ -10,33 +10,22 @@ class ClockifyApp:
         self.WORKSPACE_ID = 'WORKSPACE_ID'
         self.USER_ID = 'USER_ID'
         self.BASE_URL = 'https://api.clockify.me/api/v1/'
-
     def get_time_entries_per_user(self, start_date, end_date):
 
         endpoint = f'workspaces/{self.WORKSPACE_ID}/user/{self.USER_ID}/time-entries'
         params = {
             'start': f'{start_date}T00:00:00Z',
             'end': f'{end_date}T23:59:59Z',
-            'page-size': 1,
         }
+        users_data = self.send_get_request(endpoint, params)
 
-        all_data = []
-        page = 1
-
-        while True:
-            params['page'] = page
-            response = self.send_get_request(endpoint, params)
-            data = response
-
-            all_data.extend(data)
-
-            if len(data) < params['page-size']:
-                break
-            page += 1
-
-        return all_data
+        return users_data
 
     def generate_raport(self, date_from='', date_to=''):
+        if not self.validate_date_format(date_from, date_to):
+            print("Invalid date format. Please provide dates in the format 'YYYY-MM-DD'. ")
+            return
+
         get_data = self.get_time_entries_per_user(date_from, date_to)
         get_user_id, get_user_name = self.get_user_data()
 
@@ -78,7 +67,6 @@ class ClockifyApp:
             formatted_duration = hours + minutes + seconds
             return formatted_duration.strip()
 
-
     def send_get_request(self, endpoint, params=None):
         headers = {
             'X-Api-Key': self.API_KEY,
@@ -98,12 +86,8 @@ class ClockifyApp:
 
     def validate_date_format(self, first_date, second_date):
         try:
-            first_date = datetime.datetime.strptime(first_date, '%Y-%m-%d')
-            second_date = datetime.datetime.strptime(second_date, '%Y-%m-%d')
-
-            if first_date > second_date:
-                print("First date can't be greater than the second one.")
-                return False
+            datetime.datetime.strptime(first_date, '%Y-%m-%d')
+            datetime.datetime.strptime(second_date, '%Y-%m-%d')
             return True
         except ValueError:
             return False
