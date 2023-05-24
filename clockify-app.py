@@ -1,6 +1,5 @@
 import requests
 import datetime
-import sys
 import csv
 import os
 
@@ -37,26 +36,16 @@ class ClockifyApp:
 
         return all_data
 
-    def generate_raport(self):
-        if len(sys.argv) != 3:
-            print("Invalid number of arguments. Please provide two dates as arguments")
-            return
-        date_from = sys.argv[1]
-        date_to = sys.argv[2]
-
+    def generate_raport(self, date_from='', date_to=''):
         get_data = self.get_time_entries_per_user(date_from, date_to)
         get_user_id, get_user_name = self.get_user_data()
-
-        if not self.validate_date_format(date_from, date_to):
-            print("Invalid date format. Please provide dates in the format 'YYYY-MM-DD'. ")
-            return
 
         for data in get_data:
             create_date = data['timeInterval']['start'][:10]
             duration = data['timeInterval']['duration']
             name = data['description']
             if name == "":
-                name = "In progres..."
+                name = "In progress..."
 
             if data['userId'] == get_user_id and date_from <= create_date <= date_to:
                 member_name = get_user_name
@@ -68,7 +57,6 @@ class ClockifyApp:
                     'Opis zadania': name,
                 }
                 print(report_data)
-
 
     def format_duration(self, duration):
         if duration != None:
@@ -102,7 +90,6 @@ class ClockifyApp:
 
         return data
 
-
     def get_user_data(self):
         endpoint = f'user'
         get_user_data = self.send_get_request(endpoint)
@@ -115,7 +102,7 @@ class ClockifyApp:
             second_date = datetime.datetime.strptime(second_date, '%Y-%m-%d')
 
             if first_date > second_date:
-                print("First date can't be greater than second one.")
+                print("First date can't be greater than the second one.")
                 return False
             return True
         except ValueError:
@@ -143,7 +130,3 @@ class ClockifyApp:
             if csvfile.read().strip() == '':
                 print(filename)
                 return
-
-
-raport = ClockifyApp()
-raport.generate_raport()
