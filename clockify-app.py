@@ -1,5 +1,6 @@
+import argparse
 import requests
-import datetime
+from datetime import datetime
 import csv
 import os
 import configparser
@@ -10,17 +11,14 @@ class ClockifyApp:
         self.config = configparser.ConfigParser()
         self.config.read('config.ini')
 
-        clockify_section = self.config['Clockify']
-        self.API_KEY = clockify_section.get('API_KEY')
-        self.WORKSPACE_ID = clockify_section.get('WORKSPACE_ID')
-        self.USER_ID = clockify_section.get('USER_ID')
+        self.API_KEY = ''
+        self.USER_ID = ''
+
         self.BASE_URL = 'https://api.clockify.me/api/v1/'
 
-        self.users = self.get_users_from_config()
-
     def get_time_entries_per_user(self, start_date, end_date):
-
-        endpoint = f'workspaces/{self.WORKSPACE_ID}/user/{self.USER_ID}/time-entries'
+        workspace_id = self.config['Clockify'].get('WORKSPACE_ID')
+        endpoint = f'workspaces/{workspace_id}/user/{self.USER_ID}/time-entries'
         params = {
             'start': f'{start_date}T00:00:00Z',
             'end': f'{end_date}T23:59:59Z',
@@ -31,54 +29,69 @@ class ClockifyApp:
         while True:
             params['page'] = page
             response = self.send_get_request(endpoint, params)
-            data = response
-            all_data.extend(data)
-
-            if len(data) == 0:
+            if len(response) == 0:
                 break
+
+            all_data.extend(response)
             page += 1
 
         return all_data
 
-    def get_users_from_config(self):
+    def get_users_from_file(self):
         users = {}
-        for section in self.config.sections():
-            if section.startswith('User'):
-                user_id = self.config.get(section, 'ID')
-                api_key = self.config.get(section, 'API_KEY')
+        with open('Users.csv', 'r') as csvfile:
+            reader = csv.DictReader(csvfile)
+            fieldnames = reader.fieldnames
+            for row in reader:
+                for fieldname in fieldnames:
+                    if fieldname.startswith('User'):
+                        user_id = row[fieldname]
+                    elif fieldname.startswith('API'):
+                        api_key = row[fieldname]
                 users[user_id] = api_key
-
-        return users
+                return users
 
     def generate_raport(self, date_from='', date_to=''):
-        if not self.validate_date_format(date_from, date_to):
-            print("Invalid date format. Please provide dates in the format 'YYYY-MM-DD'. ")
-            return
+        self.validate_date_format(date_from, date_to)
 
-        for user_id, api_key in self.users.items():
-            self.API_KEY = api_key
-            self.USER_ID = user_id
-            get_data = self.get_time_entries_per_user(date_from, date_to)
-            get_user_id, get_user_name = self.get_user_data()
+        users = self.get_users_from_file()
+        for user_id, api_key in users.items():
+                self.API_KEY = api_key
+                self.USER_ID = user_id
 
-            for data in get_data:
-                create_date = data['timeInterval']['start'][:10]
-                duration = data['timeInterval']['duration']
-                name = data['description']
-                if name == "":
-                    name = "In progress..."
+                get_data = self.get_time_entries_per_user(date_from, date_to)
+                get_user_id, get_user_name = self.get_user_data()
 
-                if data['userId'] == get_user_id and date_from <= create_date <= date_to:
-                    member_name = get_user_name
+                for data in get_data:
+                    create_date = data['timeInterval']['start'][:10]
+                    duration = data['timeInterval']['duration']
+                    name = data['description']
+                    if name == "":
+                        name = "In progress..."
 
-                    report_data = {
-                        'Imię i nazwisko': " ".join(member_name.split(" ")[::-1]),
-                        'Data': create_date,
-                        'Czas trwania': self.format_duration(duration),
-                        'Opis zadania': name,
-                    }
-                    print(report_data)
+                    if data['userId'] == get_user_id and date_from <= create_date <= date_to:
+                        member_name = get_user_name
 
+                        report_data = {
+                            'Fullname': " ".join(member_name.split(" ")[::-1]),
+                            'Date': create_date,
+                            'Duration time': self.format_duration(duration),
+                            'Task description': name,
+                        }
+                        report_data = {self.translation_mapper().get(key, key): value for key, value in
+                                          report_data.items()}
+
+                        print(report_data)
+
+
+    def translation_mapper(self):
+        translation_mapping = {
+            'Fullname': 'Imie i nazwisko',
+            'Date': 'Data',
+            'Duration time': 'Czas trwania',
+            'Task description': 'Opis zadania',
+        }
+        return translation_mapping
     def format_duration(self, duration):
         if duration != None:
             duration = duration[2:]
@@ -117,11 +130,11 @@ class ClockifyApp:
 
     def validate_date_format(self, first_date, second_date):
         try:
-            datetime.datetime.strptime(first_date, '%Y-%m-%d')
-            datetime.datetime.strptime(second_date, '%Y-%m-%d')
-            return True
+            datetime.strptime(first_date, '%Y-%m-%d')
+            datetime.strptime(second_date, '%Y-%m-%d')
         except ValueError:
-            return False
+            msg = "Invalid date format!".format((first_date, second_date))
+            raise argparse.ArgumentTypeError(msg)
 
     def create_report(self, report_data):
         filename = 'report.csv'
@@ -135,13 +148,16 @@ class ClockifyApp:
                         return
 
         with open(filename, 'a', newline='') as csvfile:
-            fieldnames = ['Imię i nazwisko', 'Data', 'Czas trwania', 'Opis zadania']
+            fieldnames = ['Imie i nazwisko', 'Data', 'Czas trwania', 'Opis zadania']
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             if is_empty:
                 writer.writeheader()
-            writer.writerow(report_data)
+
+            report_data_en = {self.translation_mapper().get(key, key): value for key, value in report_data.items()}
+            writer.writerow(report_data_en)
 
         with open(filename, 'r') as csvfile:
             if csvfile.read().strip() == '':
                 print(filename)
                 return
+
