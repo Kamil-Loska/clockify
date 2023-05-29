@@ -1,9 +1,10 @@
-from main import ClockifyApp
-from parser import parse_arguments
+from ClockifyReportGenerator import ClockifyReportGenerator
+from Argument_provider import ArgumentProvider
+
 
 def main():
-    args = parse_arguments()
-    clockify = ClockifyApp()
+    args = ArgumentProvider().argument_parser()
+    clockify = ClockifyReportGenerator()
     clockify.generate_raport(args.date_from, args.date_to)
 
 if __name__ == '__main__':
