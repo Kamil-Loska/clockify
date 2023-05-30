@@ -1,6 +1,7 @@
 import requests
-import ClockifyReportGenerator
 from FileHandler import FileHandler
+
+
 class ClockifyAPI:
 
     def __init__(self):
@@ -9,6 +10,7 @@ class ClockifyAPI:
 
         self.BASE_URL = 'https://api.clockify.me/api/v1/'
         self.file_handler = FileHandler()
+
     def send_get_request(self, endpoint, params=None):
         headers = {
             'X-Api-Key': self.API_KEY,
