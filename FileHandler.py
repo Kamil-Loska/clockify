@@ -20,7 +20,7 @@ class FileHandler:
                     elif fieldname.startswith('API'):
                         api_key = row[fieldname]
                 users[user_id] = api_key
-        return users
+            return users
 
     def translation_mapper(self):
         field_mappings = self.config['FIELDINFO']

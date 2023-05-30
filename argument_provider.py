@@ -9,7 +9,7 @@ class ArgumentProvider:
             datetime.strptime(date_to, '%Y-%m-%d')
             return True
         except ValueError:
-            raise argparse.ArgumentTypeError(ValueError)
+            return False
 
     def argument_parser(self):
         parser = argparse.ArgumentParser(description='Generate Clockify report')
