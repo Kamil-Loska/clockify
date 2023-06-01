@@ -15,3 +15,6 @@
 ######################
 config.ini
 Users.csv
+.idea
+.pytest_cache
+__pycache__

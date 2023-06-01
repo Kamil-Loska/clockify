@@ -3,6 +3,7 @@ from datetime import datetime
 
 
 class ArgumentProvider:
+
     def validate_date_format(self, date_from, date_to):
         try:
             datetime.strptime(date_from, '%Y-%m-%d')
