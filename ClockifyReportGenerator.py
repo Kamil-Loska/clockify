@@ -8,8 +8,6 @@ from FileHandler import FileHandler
 class ClockifyReportGenerator:
 
     def generate_report(self, date_from, date_to):
-        argument_provider = ArgumentProvider()
-        argument_provider.validate_date_format(date_from, date_to)
 
         file_handler = FileHandler('config.ini')
         workspace_id = file_handler.config['Clockify'].get('WORKSPACE_ID')

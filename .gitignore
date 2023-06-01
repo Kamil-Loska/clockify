@@ -18,3 +18,4 @@ Users.csv
 .idea
 .pytest_cache
 __pycache__
+__init__
