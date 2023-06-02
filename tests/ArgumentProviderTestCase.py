@@ -10,11 +10,8 @@ class ArgumentProviderTestCase(unittest.TestCase):
     def test_argument_parser_valid_arguments(self, mock_error):
         with patch('argparse.ArgumentParser.parse_args',
                    return_value=argparse.Namespace(date_from='2023-05-15', date_to='2023-05-16')):
-            args = ArgumentProvider().argument_parser()
+            args = ArgumentProvider().arguments_provider()
         self.assertEqual(args.date_from, '2023-05-15')
         self.assertEqual(args.date_to, '2023-05-16')
         mock_error.assert_not_called()
 
-
-if __name__ == '__main__':
-    unittest.main()

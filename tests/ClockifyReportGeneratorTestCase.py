@@ -7,7 +7,9 @@ import os
 class TestClockifyReportGenerator(unittest.TestCase):
 
     def setUp(self):
-        self.clockify_report_generator = ClockifyReportGenerator()
+        config_handler = MagicMock()
+        credentials_file = MagicMock()
+        self.clockify_report_generator = ClockifyReportGenerator(config_handler, credentials_file)
 
     def test_generate_report(self):
         os.chdir('..')

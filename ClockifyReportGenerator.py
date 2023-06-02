@@ -1,29 +1,28 @@
 from ClockifyAPI import ClockifyAPI
 import csv
 import os
-from Argument_provider import ArgumentProvider
-from FileHandler import FileHandler
 
 
 class ClockifyReportGenerator:
+    def __init__(self, config_handler, credentials_file):
+        self.config_handler = config_handler
+        self.credentials_file = credentials_file
 
     def generate_report(self, date_from, date_to):
+        workspace_id = self.config_handler.get_workspace_id()
+        users_credentials = self.credentials_file.load_user_credentials_from_file()
 
-        file_handler = FileHandler('config.ini')
-        workspace_id = file_handler.config['Clockify'].get('WORKSPACE_ID')
-        users = file_handler.get_users_from_file()
-
-        for user_id, api_key in users.items():
-            clockify_api = ClockifyAPI(workspace_id, api_key, user_id)
-            time_entries = clockify_api.get_time_entries_per_user(date_from, date_to)
-            user_name = clockify_api.get_user_name()
+        for user_id, api_key in users_credentials.items():
+            clockify_api = ClockifyAPI(workspace_id)
+            time_entries = clockify_api.get_time_entries_per_user(api_key, user_id, date_from, date_to)
+            user_name = clockify_api.get_user_name(api_key)
 
             for data in time_entries:
                 create_date = data['timeInterval']['start'][:10]
                 duration = data['timeInterval']['duration']
-                description_name = data['description']
-                if description_name == "":
-                    description_name = "In progress..."
+                description = data['description']
+                if description == "":
+                    description = "In progress..."
 
                 if data['userId'] == user_id and date_from <= create_date <= date_to:
 
@@ -31,10 +30,10 @@ class ClockifyReportGenerator:
                         'Fullname': " ".join(user_name.split(" ")[::-1]),
                         'Date': create_date,
                         'Duration time': self.format_duration(duration),
-                        'Task description': description_name,
+                        'Task description': description,
                     }
 
-                    report_date = {file_handler.translation_mapper().get(key, key): value for key, value in
+                    report_date = {self.config_handler.translation_mapper().get(key, key): value for key, value in
                                    report_data.items()}
 
                     print(report_date)

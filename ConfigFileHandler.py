@@ -1,22 +1,14 @@
 import configparser
-import csv
 
 
-class FileHandler:
+class ConfigFileHandler:
 
     def __init__(self, config_file):
         self.config = configparser.ConfigParser()
         self.config.read(config_file)
 
-    def get_users_from_file(self):
-        users = {}
-        with open('Users.csv', 'r') as csvfile:
-            reader = csv.DictReader(csvfile)
-            for row in reader:
-                user_id = row['User_ID']
-                api_key = row['API_KEY']
-                users[user_id] = api_key
-        return users
+    def get_workspace_id(self):
+        return self.config.get('Clockify', 'WORKSPACE_ID')
 
     def translation_mapper(self):
         field_mappings = self.config['FIELDINFO']
