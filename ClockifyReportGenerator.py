@@ -1,19 +1,13 @@
-from ClockifyAPI import ClockifyAPI
 import csv
 import os
 
 
 class ClockifyReportGenerator:
-    def __init__(self, config_handler, api_key, user_id, clockify_api):
+    def __init__(self, config_handler, api_key):
         self.config_handler = config_handler
         self.api_key = api_key
-        self.user_id = user_id
-        self.clockify_api = clockify_api
 
-    def generate_report(self, date_from, date_to):
-
-        time_entries = self.clockify_api.get_time_entries_per_user(self.api_key, self.user_id, date_from, date_to)
-        user_name = self.clockify_api.get_user_name(self.api_key)
+    def generate_report(self, user_name, time_entries, date_from, date_to):
 
         for data in time_entries:
             create_date = data['timeInterval']['start'][:10]
@@ -22,13 +16,13 @@ class ClockifyReportGenerator:
             if description == "":
                 description = "In progress..."
 
-            if data['userId'] == self.user_id and date_from <= create_date <= date_to:
+            if date_from <= create_date <= date_to:
 
                 report_data = {
                     'Fullname': "-".join(user_name.split(" ")[::-1]),
                     'Date': create_date,
-                    'Duration-time': '-'.join(self.format_duration(duration).split()),
-                    'Task-description': '-'.join(description.split()),
+                    'Duration-time': self.format_duration(duration),
+                    'Task-description': description,
                 }
 
                 report_date = {self.config_handler.translation_mapper().get(key, key): value for key, value in

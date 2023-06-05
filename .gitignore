@@ -19,4 +19,3 @@ Users.csv
 .pytest_cache
 __pycache__
 __init__
-fake_config.ini
