@@ -1,30 +1,28 @@
+import csv
+import os
 import unittest
-from unittest.mock import patch, MagicMock
 from UsersFileHandler import UserHandler
+from unittest.mock import patch
 
 
 class UsersFileHandlerTestCase(unittest.TestCase):
 
-    @patch('builtins.open')
-    @patch('csv.DictReader')
-    def test_get_users_from_file(self, mock_dict_reader, mock_open):
-        user_handler = UserHandler('Users.csv')
-        mock_csv_file = MagicMock()
-        mock_dict_reader.return_value = mock_csv_file
-        mock_csv_file.fieldnames = ['User_ID', 'API_KEY']
-        mock_csv_file.__iter__.return_value = [
-            {'User_ID': '123', 'API_KEY': 'api_key_1'},
-            {'User_ID': '456', 'API_KEY': 'api_key_2'},
-            {'User_ID': '789', 'API_KEY': 'api_key_3'}
-        ]
-        result = user_handler.load_user_credentials_from_file()
+    def setUp(self):
+        self.test_file = 'test_users.csv'
+        with open(self.test_file, 'w', newline='') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=['User_ID', 'API_KEY'])
+            writer.writeheader()
+            writer.writerow({'User_ID': '1', 'API_KEY': 'key_1'})
+            writer.writerow({'User_ID': '2', 'API_KEY': 'key_2'})
 
-        mock_open.assert_called_once_with('Users.csv', 'r')
-        mock_dict_reader.assert_called_once_with(mock_open.return_value.__enter__.return_value)
+    def tearDown(self):
+        os.remove(self.test_file)
 
-        expected_result = {
-            '123': 'api_key_1',
-            '456': 'api_key_2',
-            '789': 'api_key_3'
-        }
-        self.assertEqual(result, expected_result)
+    def test_load_user_credentials_from_file(self):
+        user_handler = UserHandler(self.test_file)
+
+        with patch('builtins.open', return_value=open(self.test_file, 'r')):
+            api_key, user_id = user_handler.load_user_credentials_from_file()
+
+            self.assertEqual(api_key, 'key_1')
+            self.assertEqual(user_id, '1')

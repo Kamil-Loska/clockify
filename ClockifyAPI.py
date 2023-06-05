@@ -32,7 +32,6 @@ class ClockifyAPI:
             response = self.send_get_request(api_key, endpoint, params)
             if len(response) == 0:
                 break
-
             all_data.extend(response)
             page += 1
 
@@ -42,3 +41,4 @@ class ClockifyAPI:
         endpoint = f'user'
         get_user_data = self.send_get_request(api_key, endpoint)
         return get_user_data['name']
+

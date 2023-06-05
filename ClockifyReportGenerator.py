@@ -4,39 +4,37 @@ import os
 
 
 class ClockifyReportGenerator:
-    def __init__(self, config_handler, credentials_file):
+    def __init__(self, config_handler, api_key, user_id, clockify_api):
         self.config_handler = config_handler
-        self.credentials_file = credentials_file
+        self.api_key = api_key
+        self.user_id = user_id
+        self.clockify_api = clockify_api
 
     def generate_report(self, date_from, date_to):
-        workspace_id = self.config_handler.get_workspace_id()
-        users_credentials = self.credentials_file.load_user_credentials_from_file()
 
-        for user_id, api_key in users_credentials.items():
-            clockify_api = ClockifyAPI(workspace_id)
-            time_entries = clockify_api.get_time_entries_per_user(api_key, user_id, date_from, date_to)
-            user_name = clockify_api.get_user_name(api_key)
+        time_entries = self.clockify_api.get_time_entries_per_user(self.api_key, self.user_id, date_from, date_to)
+        user_name = self.clockify_api.get_user_name(self.api_key)
 
-            for data in time_entries:
-                create_date = data['timeInterval']['start'][:10]
-                duration = data['timeInterval']['duration']
-                description = data['description']
-                if description == "":
-                    description = "In progress..."
+        for data in time_entries:
+            create_date = data['timeInterval']['start'][:10]
+            duration = data['timeInterval']['duration']
+            description = data['description']
+            if description == "":
+                description = "In progress..."
 
-                if data['userId'] == user_id and date_from <= create_date <= date_to:
+            if data['userId'] == self.user_id and date_from <= create_date <= date_to:
 
-                    report_data = {
-                        'Fullname': " ".join(user_name.split(" ")[::-1]),
-                        'Date': create_date,
-                        'Duration time': self.format_duration(duration),
-                        'Task description': description,
-                    }
+                report_data = {
+                    'Fullname': "-".join(user_name.split(" ")[::-1]),
+                    'Date': create_date,
+                    'Duration-time': '-'.join(self.format_duration(duration).split()),
+                    'Task-description': '-'.join(description.split()),
+                }
 
-                    report_date = {self.config_handler.translation_mapper().get(key, key): value for key, value in
-                                   report_data.items()}
+                report_date = {self.config_handler.translation_mapper().get(key, key): value for key, value in
+                               report_data.items()}
 
-                    print(report_date)
+                print(report_date)
 
     def format_duration(self, duration):
         if duration is not None:
