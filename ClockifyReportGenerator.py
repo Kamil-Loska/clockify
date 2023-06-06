@@ -7,7 +7,10 @@ class ClockifyReportGenerator:
         self.config_handler = config_handler
         self.api_key = api_key
 
-    def generate_report(self, user_name, time_entries, date_from, date_to):
+    def generate_report(self, clockify_api, user_id, date_from, date_to):
+        time_entries = clockify_api.get_time_entries_per_user(self.api_key, user_id, date_from, date_to)
+        user_name = clockify_api.get_user_name(self.api_key)
+        report_entries = []
 
         for data in time_entries:
             create_date = data['timeInterval']['start'][:10]
@@ -27,8 +30,9 @@ class ClockifyReportGenerator:
 
                 report_date = {self.config_handler.translation_mapper().get(key, key): value for key, value in
                                report_data.items()}
+                report_entries.append(report_date)
 
-                print(report_date)
+        return report_entries
 
     def format_duration(self, duration):
         if duration is not None:
@@ -50,7 +54,7 @@ class ClockifyReportGenerator:
             formatted_duration = hours + minutes + seconds
             return formatted_duration.strip()
 
-    def create_report(self, report_data, file_handler):
+    def create_report(self, report_data, config_file_handler):
         filename = 'report.csv'
 
         is_empty = os.stat(filename).st_size == 0
@@ -61,17 +65,17 @@ class ClockifyReportGenerator:
                     if row == report_data:
                         return
 
-        with open(filename, 'a', newline='') as csvfile:
-            fieldnames = list(file_handler.translation_mapper().values())
+        with open(filename, 'w', newline='') as csvfile:
+            fieldnames = list(config_file_handler.translation_mapper().values())
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             if is_empty:
                 writer.writeheader()
 
-            report_data_en = {file_handler.translation_mapper().get(key, key): value for key, value in
+            report_data_en = {config_file_handler.translation_mapper().get(key, key): value for key, value in
                               report_data.items()}
             writer.writerow(report_data_en)
 
-        with open(filename, 'r') as csvfile:
-            if csvfile.read().strip() == '':
-                print(filename)
-                return
+        # with open(filename, 'r') as csvfile:
+        #     if csvfile.read().strip() == '':
+        #         print(filename)
+        #         return

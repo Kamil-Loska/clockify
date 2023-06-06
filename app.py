@@ -11,14 +11,14 @@ def main():
 
     config_file_handler = ConfigFileHandler('config.ini')
     user_file_handler = UserHandler('Users.csv')
-    users = user_file_handler.load_user_credentials_from_file()
     clockify_api = ClockifyAPI(config_file_handler.get_workspace_id())
-
+    users = user_file_handler.load_user_credentials_from_file()
     for api_key, user_id in users:
-        user_name = clockify_api.get_user_name(api_key)
-        time_entries = clockify_api.get_time_entries_per_user(api_key, user_id, args.date_from, args.date_to)
-        clockify = ClockifyReportGenerator(config_file_handler, api_key)
-        clockify.generate_report(user_name, time_entries, args.date_from, args.date_to)
+        clockify_generator = ClockifyReportGenerator(config_file_handler, api_key)
+        report_entries = clockify_generator.generate_report(clockify_api, user_id, args.date_from, args.date_to)
+        for report in report_entries:
+            print(report)
+
 
 
 if __name__ == '__main__':
