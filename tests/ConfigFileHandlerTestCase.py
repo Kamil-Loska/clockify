@@ -10,10 +10,10 @@ class UsersFileHandlerTestCase(unittest.TestCase):
         self.mock_config_file = 'mock_config.ini'
         config = ConfigParser()
         config['FIELDINFO'] = {
-            'field1': 'Imie i nazwisko',
-            'field2': 'Data',
-            'field3': 'Czas trwania',
-            'field4': 'Opis zadania'
+            'Fullname': 'Imie i nazwisko',
+            'Data': 'Data',
+            'Duration-time': 'Czas trwania',
+            'Description': 'Opis zadania'
         }
         with open(self.mock_config_file, 'w') as configfile:
             config.write(configfile)

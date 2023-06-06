@@ -21,8 +21,17 @@ class UsersFileHandlerTestCase(unittest.TestCase):
     def test_load_user_credentials_from_file(self):
         user_handler = UserHandler(self.test_file)
 
-        with patch('builtins.open', return_value=open(self.test_file, 'r')):
-            api_key, user_id = user_handler.load_user_credentials_from_file()
+        with patch('builtins.open', return_value=open(self.test_file, 'r')) as mock_file:
+            users = user_handler.load_user_credentials_from_file()
 
+            mock_file.assert_called_once_with(self.test_file, 'r')
+
+            self.assertGreater(len(users), 0)
+
+            api_key, user_id = users[0]
             self.assertEqual(api_key, 'key_1')
             self.assertEqual(user_id, '1')
+
+            api_key, user_id = users[1]
+            self.assertEqual(api_key, 'key_2')
+            self.assertEqual(user_id, '2')

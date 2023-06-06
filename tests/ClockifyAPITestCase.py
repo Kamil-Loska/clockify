@@ -14,7 +14,7 @@ class ClockifyAPITestCase(unittest.TestCase):
     def setUp(self):
         self.clockify_api = ClockifyAPI(workspace_id='workspace_id')
 
-    @patch('UsersFileHandler.UserHandler.load_user_credentials')
+    @patch('UsersFileHandler.UserHandler.load_user_credentials_from_file')
     @patch('ClockifyAPI.requests.get')
     def test_send_get_request(self, mock_get, mock_load_user_credentials):
         users_credentials = {'456': 'API_KEY'}

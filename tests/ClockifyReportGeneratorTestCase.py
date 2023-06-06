@@ -14,7 +14,6 @@ class TestClockifyReportGenerator(unittest.TestCase):
     def test_generate_report(self):
         os.chdir('..')
         expected_keys = ['Fullname', 'Date', 'Duration time', 'Task description']
-
         argument_provider = MagicMock()
         argument_provider.validate_date_format.return_value = None
         self.clockify_report_generator.argument_provider = argument_provider
@@ -52,7 +51,9 @@ class TestClockifyReportGenerator(unittest.TestCase):
         clockify_api.get_user_name.return_value = 'John Doe'
         self.clockify_report_generator.ClockifyAPI = MagicMock(return_value=clockify_api)
 
-        self.clockify_report_generator.generate_report('2023-01-01', '2023-01-31')
+        self.clockify_report_generator.generate_report(clockify_api.get_user_name.return_value,
+                                                       clockify_api.get_time_entries_per_user.return_value,
+                                                       '2023-01-01', '2023-01-31')
 
         for report_date in file_handler.translation_mapper.call_args_list:
             for key in expected_keys:

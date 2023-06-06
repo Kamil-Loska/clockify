@@ -12,7 +12,6 @@ class ArgumentProvider:
         except ValueError:
             return False
 
-
     def get_arguments(self):
         parser = argparse.ArgumentParser(description='Generate Clockify report')
         parser.add_argument('--from', dest='date_from', required=True, help='Start date (YYYY-MM-DD)')
