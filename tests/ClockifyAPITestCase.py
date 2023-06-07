@@ -1,6 +1,8 @@
 import unittest
-import pytest
 from unittest.mock import MagicMock, patch
+
+import pytest as pytest
+
 from ClockifyAPI import ClockifyAPI
 
 
@@ -17,7 +19,7 @@ class ClockifyAPITestCase(unittest.TestCase):
     @patch('UsersFileHandler.UserHandler.load_user_credentials_from_file')
     @patch('ClockifyAPI.requests.get')
     def test_send_get_request(self, mock_get, mock_load_user_credentials):
-        users_credentials = {'456': 'API_KEY'}
+        users_credentials = [{'User_ID': '456', 'API_KEY': 'API_KEY'}]
         mock_load_user_credentials.return_value = users_credentials
 
         endpoint = 'workspaces/123/user/456/time-entries'
@@ -47,14 +49,14 @@ class ClockifyAPITestCase(unittest.TestCase):
             [],
         ]
         self.clockify_api.send_get_request = MagicMock(side_effect=mock_responses)
-        result = self.clockify_api.get_time_entries_per_user('API_KEY', 'USER_ID', '2023-05-15', '2023-05-16')
+        result = self.clockify_api.get_time_entries_per_user({'api_key': 'API_KEY', 'user_id': 'USER_ID'},
+                                                             '2023-05-15', '2023-05-16')
         expected_result = [
             {'data': 'response1'},
             {'data': 'response2'},
             {'data': 'response3'},
             {'data': 'response4'},
             {'data': 'response5'},
-
         ]
         self.clockify_api.send_get_request.assert_called_with('API_KEY', expected_endpoint, expected_params)
         self.assertEqual(result, expected_result)
@@ -64,7 +66,8 @@ class ClockifyAPITestCase(unittest.TestCase):
         mock_response = {'name': 'John Doe'}
         mock_get_request.return_value = mock_response
 
-        result = self.clockify_api.get_user_name('API_KEY')
+        result = self.clockify_api.get_user_name({'api_key': 'API_KEY'})
 
         mock_get_request.assert_called_once_with('API_KEY', 'user')
         self.assertEqual(result, 'John Doe')
+
