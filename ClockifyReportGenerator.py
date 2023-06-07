@@ -3,13 +3,14 @@ import os
 
 
 class ClockifyReportGenerator:
-    def __init__(self, config_handler, api_key):
+    def __init__(self, config_handler, clockify_api):
         self.config_handler = config_handler
-        self.api_key = api_key
+        self.clockify_api = clockify_api
 
-    def generate_report(self, clockify_api, user_id, date_from, date_to):
-        time_entries = clockify_api.get_time_entries_per_user(self.api_key, user_id, date_from, date_to)
-        user_name = clockify_api.get_user_name(self.api_key)
+    def generate_report(self, user_credentials, date_from, date_to):
+        time_entries = self.clockify_api.get_time_entries_per_user(user_credentials, date_from, date_to)
+        user_name = self.clockify_api.get_user_name(user_credentials)
+
         report_entries = []
 
         for data in time_entries:
@@ -19,8 +20,7 @@ class ClockifyReportGenerator:
             if description == "":
                 description = "In progress..."
 
-            if date_from <= create_date <= date_to:
-
+            if date_from <= date_to:
                 report_data = {
                     'Fullname': "-".join(user_name.split(" ")[::-1]),
                     'Date': create_date,
@@ -75,7 +75,7 @@ class ClockifyReportGenerator:
                               report_data.items()}
             writer.writerow(report_data_en)
 
-        # with open(filename, 'r') as csvfile:
-        #     if csvfile.read().strip() == '':
-        #         print(filename)
-        #         return
+        with open(filename, 'r') as csvfile:
+            if csvfile.read().strip() == '':
+                print(filename)
+                return

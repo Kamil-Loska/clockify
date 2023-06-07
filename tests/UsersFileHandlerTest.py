@@ -28,10 +28,8 @@ class UsersFileHandlerTestCase(unittest.TestCase):
 
             self.assertGreater(len(users), 0)
 
-            api_key, user_id = users[0]
-            self.assertEqual(api_key, 'key_1')
-            self.assertEqual(user_id, '1')
+            user_1 = {'User_ID': '1', 'API_KEY': 'key_1'}
+            user_2 = {'User_ID': '2', 'API_KEY': 'key_2'}
 
-            api_key, user_id = users[1]
-            self.assertEqual(api_key, 'key_2')
-            self.assertEqual(user_id, '2')
+            self.assertIn(user_1, users)
+            self.assertIn(user_2, users)

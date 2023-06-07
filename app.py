@@ -13,13 +13,16 @@ def main():
     user_file_handler = UserHandler('Users.csv')
     clockify_api = ClockifyAPI(config_file_handler.get_workspace_id())
     users = user_file_handler.load_user_credentials_from_file()
-    for api_key, user_id in users:
-        clockify_generator = ClockifyReportGenerator(config_file_handler, api_key)
-        report_entries = clockify_generator.generate_report(clockify_api, user_id, args.date_from, args.date_to)
+    for user_credential in users:
+        clockify_generator = ClockifyReportGenerator(config_file_handler, clockify_api)
+        user_credentials = {
+            'api_key': user_credential['API_KEY'],
+            'user_id': user_credential['User_ID']
+        }
+        report_entries = clockify_generator.generate_report(user_credentials, args.date_from, args.date_to)
         for report in report_entries:
             print(report)
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

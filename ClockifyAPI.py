@@ -18,8 +18,8 @@ class ClockifyAPI:
 
         return data
 
-    def get_time_entries_per_user(self, api_key, user_id, start_date, end_date):
-        endpoint = f'workspaces/{self.workspace_id}/user/{user_id}/time-entries'
+    def get_time_entries_per_user(self, user_credentials, start_date, end_date):
+        endpoint = f'workspaces/{self.workspace_id}/user/{user_credentials["user_id"]}/time-entries'
         params = {
             'start': f'{start_date}T00:00:00Z',
             'end': f'{end_date}T23:59:59Z',
@@ -29,7 +29,7 @@ class ClockifyAPI:
 
         while True:
             params['page'] = page
-            response = self.send_get_request(api_key, endpoint, params)
+            response = self.send_get_request(user_credentials['api_key'], endpoint, params)
             if len(response) == 0:
                 break
             all_data.extend(response)
@@ -39,6 +39,6 @@ class ClockifyAPI:
 
     def get_user_name(self, api_key):
         endpoint = f'user'
-        get_user_data = self.send_get_request(api_key, endpoint)
+        get_user_data = self.send_get_request(api_key['api_key'], endpoint)
         return get_user_data['name']
 

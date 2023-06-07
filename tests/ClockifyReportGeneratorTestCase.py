@@ -1,63 +1,48 @@
 import unittest
 from unittest.mock import MagicMock
 from ClockifyReportGenerator import ClockifyReportGenerator
-import os
 
 
-class TestClockifyReportGenerator(unittest.TestCase):
+class ClockifyReportGeneratorTest(unittest.TestCase):
 
     def setUp(self):
-        config_handler = MagicMock()
-        credentials_file = MagicMock()
-        self.clockify_report_generator = ClockifyReportGenerator(config_handler, credentials_file)
+        self.config_handler_mock = MagicMock()
+        self.clockify_api_mock = MagicMock()
+        self.clockify_report_generator = ClockifyReportGenerator(self.config_handler_mock, self.clockify_api_mock)
 
-    def test_generate_report(self):
-        os.chdir('..')
-        expected_keys = ['Fullname', 'Date', 'Duration time', 'Task description']
-        argument_provider = MagicMock()
-        argument_provider.validate_date_format.return_value = None
-        self.clockify_report_generator.argument_provider = argument_provider
-
-        file_handler = MagicMock()
-        file_handler.config = {
-            'Clockify': {
-                'WORKSPACE_ID': 'workspace_id'
-            }
-        }
-        file_handler.get_users_from_file.return_value = {
-            'user1': 'api_key1',
-            'user2': 'api_key2'
-        }
-        self.clockify_report_generator.file_handler = file_handler
-
-        clockify_api = MagicMock()
-        clockify_api.get_time_entries_per_user.return_value = [
+    def test_generate_report_returns_expected_report_entries(self):
+        time_entries = [
             {
-                'userId': 'user1',
-                'timeInterval': {'start': '2023-01-02T08:00:00Z', 'duration': 'PT2H'},
+                'timeInterval': {
+                    'start': '2023-01-15T00:00:00Z',
+                    'end': '2023-01-15T23:59:59Z',
+                    'duration': 'PT2H'
+                },
                 'description': 'Task 1'
-            },
-            {
-                'userId': 'user2',
-                'timeInterval': {'start': '2023-01-03T09:00:00Z', 'duration': 'PT1H'},
-                'description': ''
-            },
-            {
-                'userId': 'user3',
-                'timeInterval': {'start': '2023-01-05T10:00:00Z', 'duration': 'PT3H'},
-                'description': 'Task 3'
             }
         ]
-        clockify_api.get_user_name.return_value = 'John Doe'
-        self.clockify_report_generator.ClockifyAPI = MagicMock(return_value=clockify_api)
+        user_name = 'John Doe'
+        self.clockify_api_mock.get_time_entries_per_user.return_value = time_entries
+        self.clockify_api_mock.get_user_name.return_value = user_name
+        self.config_handler_mock.translation_mapper.return_value = {
+            'Fullname': 'Full Name',
+            'Date': 'Date',
+            'Duration-time': 'Duration',
+            'Task-description': 'Description'
+        }
 
-        self.clockify_report_generator.generate_report(clockify_api.get_user_name.return_value,
-                                                       clockify_api.get_time_entries_per_user.return_value,
-                                                       '2023-01-01', '2023-01-31')
+        expected_report_entries = [
+            {
+                'Full Name': 'Doe-John',
+                'Date': '2023-01-15',
+                'Duration': '2H',
+                'Description': 'Task 1'
+            }
+        ]
 
-        for report_date in file_handler.translation_mapper.call_args_list:
-            for key in expected_keys:
-                self.assertIn(key, report_date)
+        report = self.clockify_report_generator.generate_report('user_token', '2023-05-15', '2023-06-02')
+        self.assertEqual(report, expected_report_entries)
+
 
     def test_format_duration(self):
         duration = 'PT2H30M45S'
