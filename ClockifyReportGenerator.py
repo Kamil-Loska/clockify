@@ -12,17 +12,15 @@ class ClockifyReportGenerator:
         user_name = self.clockify_api.get_user_name(user_credentials)
 
         report_entries = []
-
         for data in time_entries:
             create_date = data['timeInterval']['start'][:10]
             duration = data['timeInterval']['duration']
             description = data['description']
             if description == "":
                 description = "In progress..."
-
             if date_from <= date_to:
                 report_data = {
-                    'Fullname': "-".join(user_name.split(" ")[::-1]),
+                    'Fullname': user_name,
                     'Date': create_date,
                     'Duration-time': self.format_duration(duration),
                     'Task-description': description,

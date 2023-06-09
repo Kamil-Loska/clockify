@@ -8,6 +8,9 @@ class ArgumentProvider:
         try:
             datetime.strptime(date_from, '%Y-%m-%d')
             datetime.strptime(date_to, '%Y-%m-%d')
+            if date_from > date_to:
+                print("First date can't be greater than second date")
+                return False
             return True
         except ValueError:
             return False
