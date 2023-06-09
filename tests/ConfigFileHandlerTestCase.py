@@ -1,19 +1,25 @@
+import configparser
 import os
 import unittest
 from configparser import ConfigParser
+from unittest.mock import patch
+
 from ConfigFileHandler import ConfigFileHandler
 
 
-class UsersFileHandlerTestCase(unittest.TestCase):
+class ConfigFileHandlerTestCase(unittest.TestCase):
 
     def setUp(self):
         self.mock_config_file = 'mock_config.ini'
-        config = ConfigParser()
+        config = configparser.ConfigParser()
+        config['Clockify'] = {
+            'WORKSPACE_ID': 'valid_id'
+        }
         config['FIELDINFO'] = {
-            'Fullname': 'Imie i nazwisko',
-            'Data': 'Data',
-            'Duration-time': 'Czas trwania',
-            'Description': 'Opis zadania'
+            'fullname': 'Imie i nazwisko',
+            'data': 'Data',
+            'duration-time': 'Czas trwania',
+            'description': 'Opis zadania'
         }
         with open(self.mock_config_file, 'w') as configfile:
             config.write(configfile)
@@ -61,3 +67,17 @@ class UsersFileHandlerTestCase(unittest.TestCase):
         }
 
         self.assertEqual(translated_mock_data, translated_data)
+
+    def test_translation_mapper_invalid(self):
+        self.config_handler.config['FIELDINFO']['fullname'] = 'Invalid Mapping'
+        result = self.config_handler.translation_mapper()
+        expected_result = {
+            'Invalid Mapping': 'Invalid Mapping',
+            'Data': 'Data',
+            'Czas trwania': 'Czas trwania',
+            'Opis zadania': 'Opis zadania'
+        }
+
+        self.assertEqual(result, expected_result)
+
+

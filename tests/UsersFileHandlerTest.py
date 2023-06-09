@@ -15,9 +15,6 @@ class UsersFileHandlerTestCase(unittest.TestCase):
             writer.writerow({'User_ID': '1', 'API_KEY': 'key_1'})
             writer.writerow({'User_ID': '2', 'API_KEY': 'key_2'})
 
-    def tearDown(self):
-        os.remove(self.test_file)
-
     def test_load_user_credentials_from_file(self):
         user_handler = UserHandler(self.test_file)
 

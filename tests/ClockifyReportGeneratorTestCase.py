@@ -69,3 +69,23 @@ class ClockifyReportGeneratorTest(unittest.TestCase):
         duration = ''
         formatted_duration = self.clockify_report_generator.format_duration(duration)
         self.assertEqual(formatted_duration, duration)
+
+    def test_generate_report_with_missing_time_interval(self):
+        mock_config_handler = MagicMock()
+        mock_clockify_api = MagicMock()
+        time_entries = [
+            {
+                'timeInterval': [],
+                'description': 'Task 1'
+            }
+        ]
+        self.clockify_api_mock.get_time_entries_per_user.return_value = time_entries
+        mock_clockify_api.get_user_name.return_value = 'John Doe'
+        report_generator = ClockifyReportGenerator(mock_config_handler, mock_clockify_api)
+
+        user_credentials = {'User_ID': '123', 'API_KEY': 'API_KEY'}
+        date_from = '2023-01-01'
+        date_to = '2023-01-01'
+        result = report_generator.generate_report(user_credentials, date_from, date_to)
+
+        self.assertEqual(result, [])
