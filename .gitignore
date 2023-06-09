@@ -19,3 +19,5 @@ Users.csv
 .pytest_cache
 __pycache__
 __init__
+report.csv
+report.xml

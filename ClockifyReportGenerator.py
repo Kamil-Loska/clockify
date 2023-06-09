@@ -1,5 +1,8 @@
 import csv
-import os
+from xml.dom import minidom
+
+from ReportComponent import ReportComposite
+from ReportLeaf import ReportLeaf
 
 
 class ClockifyReportGenerator:
@@ -7,11 +10,11 @@ class ClockifyReportGenerator:
         self.config_handler = config_handler
         self.clockify_api = clockify_api
 
-    def generate_report(self, user_credentials, date_from, date_to):
+    def generate_report(self, user_credentials, date_from, date_to, format):
         time_entries = self.clockify_api.get_time_entries_per_user(user_credentials, date_from, date_to)
         user_name = self.clockify_api.get_user_name(user_credentials)
 
-        report_entries = []
+        report_entries = ReportComposite()
         for data in time_entries:
             create_date = data['timeInterval']['start'][:10]
             duration = data['timeInterval']['duration']
@@ -28,9 +31,16 @@ class ClockifyReportGenerator:
 
                 report_date = {self.config_handler.translation_mapper().get(key, key): value for key, value in
                                report_data.items()}
-                report_entries.append(report_date)
 
-        return report_entries
+                leaf = ReportLeaf(report_date)
+                report_entries.add_component(leaf)
+
+        if format == 'csv':
+            return self.generate_csv_report(report_entries.generate_report())
+        elif format == 'xml':
+            return self.generate_xml_report(report_entries.generate_report())
+        else:
+            return self.generate_console_report(report_entries.generate_report())
 
     def format_duration(self, duration):
         if duration is not None:
@@ -52,28 +62,35 @@ class ClockifyReportGenerator:
             formatted_duration = hours + minutes + seconds
             return formatted_duration.strip()
 
-    def create_report(self, report_data, config_file_handler):
+    def generate_csv_report(self, report_entries):
         filename = 'report.csv'
 
-        is_empty = os.stat(filename).st_size == 0
-        if not is_empty:
-            with open(filename, 'r') as csvfile:
-                reader = csv.DictReader(csvfile)
-                for row in reader:
-                    if row == report_data:
-                        return
-
-        with open(filename, 'w', newline='') as csvfile:
-            fieldnames = list(config_file_handler.translation_mapper().values())
+        with open(filename, 'w', newline='', encoding='UTF8') as csvfile:
+            fieldnames = list(report_entries[0].keys())
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-            if is_empty:
-                writer.writeheader()
 
-            report_data_en = {config_file_handler.translation_mapper().get(key, key): value for key, value in
-                              report_data.items()}
-            writer.writerow(report_data_en)
+            for report_data in report_entries:
+                writer.writerow(report_data)
+            print(csvfile.name)
 
-        with open(filename, 'r') as csvfile:
-            if csvfile.read().strip() == '':
-                print(filename)
-                return
+    def generate_xml_report(self, report_entries):
+        root = minidom.Document()
+        xml = root.createElement('root')
+        root.appendChild(xml)
+        for report_data in report_entries:
+            productChild = root.createElement('ClockifyReport')
+            productChild.setAttribute('Fullname', f'{report_data["Fullname"]}')
+            productChild.setAttribute('Date', f'{report_data["Date"]}')
+            productChild.setAttribute('Duration-time', f'{report_data["Duration-time"]}')
+            productChild.setAttribute('Task-description', f'{report_data["Task-description"]}')
+            xml.appendChild(productChild)
+
+        xml_str = root.toprettyxml(indent='\t')
+        save_to_file = 'report.xml'
+        with open(save_to_file, 'w') as xmlFile:
+            xmlFile.write(xml_str)
+        print(xmlFile.name)
+
+    def generate_console_report(self, report_entries):
+        for report_data in report_entries:
+            print(report_data)
