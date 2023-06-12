@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, patch, Mock
 import pytest as pytest
 from ClockifyAPI import ClockifyAPI
 
@@ -64,11 +64,15 @@ class ClockifyAPITestCase(unittest.TestCase):
     @patch('ClockifyAPI.requests.get')
     def test_get_user_data(self, mock_get_request):
         mock_response = {'name': 'John Doe'}
-        mock_get_request.return_value = mock_response
+        mock_get_request.return_value.json.return_value = mock_response
 
-        result = self.clockify_api.get_user_name({'API_KEY'})
+        result = self.clockify_api.get_user_name({'API_KEY': 'api_key'})
 
-        mock_get_request.assert_called_once_with('API_KEY', 'user')
+        mock_get_request.assert_called_once_with(
+            self.clockify_api.BASE_URL + 'user',
+            headers={'X-Api-Key': 'api_key', 'Content-Type': 'application/json'},
+            params=None
+        )
         self.assertEqual(result, 'John Doe')
 
     @patch('UsersFileHandler.UserHandler.load_user_credentials_from_file')

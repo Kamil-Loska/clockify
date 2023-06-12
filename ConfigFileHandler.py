@@ -12,5 +12,5 @@ class ConfigFileHandler:
 
     def translation_mapper(self):
         field_mappings = self.config['FIELDINFO']
-        translation_mapping = {value: field_mappings.get(key) for key, value in field_mappings.items()}
+        translation_mapping = {key.title(): value for key, value in field_mappings.items()}
         return translation_mapping

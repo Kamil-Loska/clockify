@@ -40,7 +40,7 @@ class ClockifyReportGeneratorTest(unittest.TestCase):
             }
         ]
 
-        report = self.clockify_report_generator.generate_report('user_token', '2023-05-15', '2023-06-02')
+        report = self.clockify_report_generator.generate_report('user_token', '2023-05-15', '2023-06-02', 'console')
         self.assertEqual(report, expected_report_entries)
 
 
@@ -72,7 +72,7 @@ class ClockifyReportGeneratorTest(unittest.TestCase):
 
     def test_generate_report_with_missing_time_interval(self):
         mock_config_handler = MagicMock()
-        mock_clockify_api = MagicMock()
+        #mock_clockify_api = MagicMock()
         time_entries = [
             {
                 'timeInterval': [],
@@ -80,12 +80,12 @@ class ClockifyReportGeneratorTest(unittest.TestCase):
             }
         ]
         self.clockify_api_mock.get_time_entries_per_user.return_value = time_entries
-        mock_clockify_api.get_user_name.return_value = 'John Doe'
-        report_generator = ClockifyReportGenerator(mock_config_handler, mock_clockify_api)
-
+        self.clockify_api_mock.get_user_name.return_value = 'John Doe'
+        report_generator = ClockifyReportGenerator(mock_config_handler, self.clockify_api_mock)
         user_credentials = {'User_ID': '123', 'API_KEY': 'API_KEY'}
         date_from = '2023-01-01'
         date_to = '2023-01-01'
-        result = report_generator.generate_report(user_credentials, date_from, date_to)
+        output_format = 'console'
+        result = report_generator.generate_report(user_credentials, date_from, date_to, output_format)
 
         self.assertEqual(result, [])

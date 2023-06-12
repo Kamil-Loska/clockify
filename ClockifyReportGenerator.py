@@ -1,7 +1,7 @@
 import csv
 from xml.dom import minidom
 
-from ReportComponent import ReportComposite
+from ReportComposite import ReportComposite
 from ReportLeaf import ReportLeaf
 
 
@@ -29,10 +29,7 @@ class ClockifyReportGenerator:
                     'Task-description': description,
                 }
 
-                report_date = {self.config_handler.translation_mapper().get(key, key): value for key, value in
-                               report_data.items()}
-
-                leaf = ReportLeaf(report_date)
+                leaf = ReportLeaf(report_data)
                 report_entries.add_component(leaf)
 
         if format == 'csv':
@@ -67,11 +64,18 @@ class ClockifyReportGenerator:
 
         with open(filename, 'w', newline='', encoding='UTF8') as csvfile:
             fieldnames = list(report_entries[0].keys())
-            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+            translated_fieldnames = [self.config_handler.translation_mapper().get(fieldname, fieldname)
+                                     for fieldname in fieldnames]
+
+            writer = csv.DictWriter(csvfile, fieldnames=translated_fieldnames)
 
             for report_data in report_entries:
-                writer.writerow(report_data)
-            print(csvfile.name)
+                translated_data = {translated_fieldnames[i]: value for i, (key, value) in
+                                   enumerate(report_data.items())}
+                writer.writerow(translated_data)
+
+        print(csvfile.name)
 
     def generate_xml_report(self, report_entries):
         root = minidom.Document()

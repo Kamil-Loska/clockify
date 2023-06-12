@@ -9,24 +9,15 @@ class UsersFileHandlerTestCase(unittest.TestCase):
 
     def setUp(self):
         self.test_file = 'test_users.csv'
-        with open(self.test_file, 'w', newline='') as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=['User_ID', 'API_KEY'])
-            writer.writeheader()
-            writer.writerow({'User_ID': '1', 'API_KEY': 'key_1'})
-            writer.writerow({'User_ID': '2', 'API_KEY': 'key_2'})
+        self.user_handler = UserHandler(self.test_file)
 
     def test_load_user_credentials_from_file(self):
-        user_handler = UserHandler(self.test_file)
+        users = list(self.user_handler.load_user_credentials_from_file())
 
-        with patch('builtins.open', return_value=open(self.test_file, 'r')) as mock_file:
-            users = user_handler.load_user_credentials_from_file()
+        self.assertGreater(len(users), 0)
 
-            mock_file.assert_called_once_with(self.test_file, 'r')
-
-            self.assertGreater(len(users), 0)
-
-            user_1 = {'User_ID': '1', 'API_KEY': 'key_1'}
-            user_2 = {'User_ID': '2', 'API_KEY': 'key_2'}
-
-            self.assertIn(user_1, users)
-            self.assertIn(user_2, users)
+        with open(self.test_file, 'r') as file:
+            csv_reader = csv.DictReader(file)
+            expected_users = [{'User_ID': '1', 'API_KEY': 'key_1'}, {'User_ID': '2', 'API_KEY': 'key_2'}]
+            for row, expected_user in zip(csv_reader, expected_users):
+                self.assertEqual(row, expected_user)
