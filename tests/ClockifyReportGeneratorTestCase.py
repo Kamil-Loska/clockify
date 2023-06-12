@@ -1,48 +1,86 @@
+import csv
+import os
+import tempfile
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 from ClockifyReportGenerator import ClockifyReportGenerator
+from ConfigFileHandler import ConfigFileHandler
 
 
 class ClockifyReportGeneratorTest(unittest.TestCase):
 
     def setUp(self):
+        self.config_handler = ConfigFileHandler('mock_config.ini')
         self.config_handler_mock = MagicMock()
         self.clockify_api_mock = MagicMock()
         self.clockify_report_generator = ClockifyReportGenerator(self.config_handler_mock, self.clockify_api_mock)
 
-    def test_generate_report_returns_expected_report_entries(self):
-        time_entries = [
+    def test_generate_csv_report(self):
+        report_entries = [
             {
-                'timeInterval': {
-                    'start': '2023-01-15T00:00:00Z',
-                    'end': '2023-01-15T23:59:59Z',
-                    'duration': 'PT2H'
-                },
-                'description': 'Task 1'
+                'Fullname': 'John Doe',
+                'Date': '2023-06-01',
+                'Duration-time': '1h 30m',
+                'Task-description': 'Task 1',
+            },
+            {
+                'Fullname': 'John Doe',
+                'Date': '2023-06-02',
+                'Duration-time': '2h',
+                'Task-description': 'Task 2',
             }
         ]
-        user_name = 'John Doe'
-        self.clockify_api_mock.get_time_entries_per_user.return_value = time_entries
-        self.clockify_api_mock.get_user_name.return_value = user_name
-        self.config_handler_mock.translation_mapper.return_value = {
-            'Fullname': 'Full Name',
-            'Date': 'Date',
-            'Duration-time': 'Duration',
-            'Task-description': 'Description'
-        }
 
+        self.clockify_report_generator.generate_csv_report(report_entries)
+
+        filename = 'report.csv'
+        self.assertTrue(os.path.exists(filename))
+
+        file_size = os.path.getsize(filename)
+        self.assertGreater(file_size, 0)
+
+    def test_generate_xml_report(self):
+        report_entries = [
+            {
+                'Fullname': 'John Doe',
+                'Date': '2023-06-01',
+                'Duration-time': '1h 30m',
+                'Task-description': 'Task 1',
+            },
+            {
+                'Fullname': 'John Doe',
+                'Date': '2023-06-02',
+                'Duration-time': '2h',
+                'Task-description': 'Task 2',
+            }
+        ]
+
+        self.clockify_report_generator.generate_xml_report(report_entries)
+
+        filename = 'report.xml'
+        self.assertTrue(os.path.exists(filename))
+
+        file_size = os.path.getsize(filename)
+        self.assertGreater(file_size, 0)
+
+    @patch('builtins.print')
+    def test_generate_console_report(self, mock_print):
         expected_report_entries = [
             {
-                'Full Name': 'Doe-John',
+                'Fullname': 'Doe-John',
                 'Date': '2023-01-15',
-                'Duration': '2H',
-                'Description': 'Task 1'
+                'Duration-time': '2h',
+                'Task-description': 'Task 2',
             }
         ]
+        self.clockify_report_generator.generate_console_report(expected_report_entries)
 
-        report = self.clockify_report_generator.generate_report('user_token', '2023-05-15', '2023-06-02', 'console')
-        self.assertEqual(report, expected_report_entries)
+        self.assertEqual(mock_print.call_count, 1)
 
+        printed_data = mock_print.call_args[0][0]
+        expected_data = {'Fullname': 'Doe-John', 'Date': '2023-01-15', 'Duration-time': '2h',
+                         'Task-description': 'Task 2'}
+        self.assertEqual(printed_data, expected_data)
 
     def test_format_duration(self):
         duration = 'PT2H30M45S'
@@ -72,13 +110,13 @@ class ClockifyReportGeneratorTest(unittest.TestCase):
 
     def test_generate_report_with_missing_time_interval(self):
         mock_config_handler = MagicMock()
-        #mock_clockify_api = MagicMock()
         time_entries = [
             {
-                'timeInterval': [],
+                'timeInterval': {'start': '2023-01-01T09:00:00Z', 'duration': 'PT1H30M'},
                 'description': 'Task 1'
-            }
+            },
         ]
+
         self.clockify_api_mock.get_time_entries_per_user.return_value = time_entries
         self.clockify_api_mock.get_user_name.return_value = 'John Doe'
         report_generator = ClockifyReportGenerator(mock_config_handler, self.clockify_api_mock)
@@ -88,4 +126,4 @@ class ClockifyReportGeneratorTest(unittest.TestCase):
         output_format = 'console'
         result = report_generator.generate_report(user_credentials, date_from, date_to, output_format)
 
-        self.assertEqual(result, [])
+        self.assertEqual(result, None)

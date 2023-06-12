@@ -10,7 +10,7 @@ class ClockifyReportGenerator:
         self.config_handler = config_handler
         self.clockify_api = clockify_api
 
-    def generate_report(self, user_credentials, date_from, date_to, format):
+    def generate_report(self, user_credentials, date_from, date_to, output_format):
         time_entries = self.clockify_api.get_time_entries_per_user(user_credentials, date_from, date_to)
         user_name = self.clockify_api.get_user_name(user_credentials)
 
@@ -32,9 +32,9 @@ class ClockifyReportGenerator:
                 leaf = ReportLeaf(report_data)
                 report_entries.add_component(leaf)
 
-        if format == 'csv':
+        if output_format == 'csv':
             return self.generate_csv_report(report_entries.generate_report())
-        elif format == 'xml':
+        elif output_format == 'xml':
             return self.generate_xml_report(report_entries.generate_report())
         else:
             return self.generate_console_report(report_entries.generate_report())
