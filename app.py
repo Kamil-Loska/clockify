@@ -26,13 +26,10 @@ def main():
     composite_writer.add_component(CsvReportWriter(config_file_handler))
     composite_writer.add_component(XmlReportWriter())
 
-    all_report_entries = []
-    for user in users:
-        report_entries = clockify_generator.generate_report(user, args.date_from, args.date_to)
-        all_report_entries.extend(report_entries)
+    report_entries = clockify_generator.generate_report(users, args.date_from, args.date_to)
 
     report_writer = factory.create_report_writer(args.output_format)
-    report_writer.write(all_report_entries)
+    report_writer.write(report_entries)
 
 
 if __name__ == "__main__":

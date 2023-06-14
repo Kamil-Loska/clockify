@@ -4,27 +4,26 @@ class ClockifyReportGenerator:
         self.config_handler = config_handler
         self.clockify_api = clockify_api
 
-    def generate_report(self, user_credentials, date_from, date_to):
-        time_entries = self.clockify_api.get_time_entries_per_user(user_credentials, date_from, date_to)
-        user_name = self.clockify_api.get_user_name(user_credentials)
-
+    def generate_report(self, users, date_from, date_to):
         report_entries = []
-        for data in time_entries:
-            create_date = data['timeInterval']['start'][:10]
-            duration = data['timeInterval']['duration']
-            description = data['description']
-            if description == "":
-                description = "In progress..."
-            if date_from <= date_to:
-                report_data = {
-                    'Fullname': user_name,
-                    'Date': create_date,
-                    'Duration-time': self.format_duration(duration),
-                    'Task-description': description,
-                }
+        for user_credentials in users:
+            time_entries = self.clockify_api.get_time_entries_per_user(user_credentials, date_from, date_to)
+            user_name = self.clockify_api.get_user_name(user_credentials)
 
-                report_entries.append(report_data)
-
+            for data in time_entries:
+                create_date = data['timeInterval']['start'][:10]
+                duration = data['timeInterval']['duration']
+                description = data['description']
+                if description == "":
+                    description = "In progress..."
+                if date_from <= date_to:
+                    report_data = {
+                        'Fullname': user_name,
+                        'Date': create_date,
+                        'Duration-time': self.format_duration(duration),
+                        'Task-description': description,
+                    }
+                    report_entries.append(report_data)
         return report_entries
 
     def format_duration(self, duration):
