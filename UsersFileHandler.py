@@ -1,5 +1,6 @@
 import csv
 
+
 class UserHandler:
 
     def __init__(self, user_file):
@@ -10,5 +11,3 @@ class UserHandler:
             reader = csv.DictReader(csvfile)
             for row in reader:
                 yield row
-
-

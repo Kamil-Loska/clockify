@@ -1,7 +1,7 @@
-from GenerateReportComposite import ReportComponent
+from ReportWriter import ReportWriter
 
 
-class ReportComposite(ReportComponent):
+class ReportComposite(ReportWriter):
 
     def __init__(self):
         self.report_components = []
@@ -12,8 +12,6 @@ class ReportComposite(ReportComponent):
     def remove_component(self, component):
         self.report_components.remove(component)
 
-    def generate_report(self):
-        report_entries = []
+    def write(self, report_entries):
         for component in self.report_components:
-            report_entries.append(component.generate_report())
-        return report_entries
+            component.write(report_entries)

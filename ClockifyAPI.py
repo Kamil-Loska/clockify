@@ -41,4 +41,3 @@ class ClockifyAPI:
         endpoint = f'user'
         get_user_data = self._send_get_request(api_key['API_KEY'], endpoint)
         return get_user_data['name']
-

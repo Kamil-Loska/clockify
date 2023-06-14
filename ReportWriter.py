@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-class ReportComponent(ABC):
+class ReportWriter(ABC):
     @abstractmethod
-    def generate_report(self):
+    def write(self, report_entries):
         pass

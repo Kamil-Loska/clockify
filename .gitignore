@@ -11,8 +11,8 @@
 *.rar
 *.zip
 
-# Files              #
-######################
+# Files #
+#############
 config.ini
 Users.csv
 .idea
