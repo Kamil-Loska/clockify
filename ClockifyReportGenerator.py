@@ -18,10 +18,10 @@ class ClockifyReportGenerator:
                     description = "In progress..."
                 if date_from <= date_to:
                     report_data = {
-                        'Fullname': user_name,
-                        'Date': create_date,
-                        'Duration-time': self.format_duration(duration),
-                        'Task-description': description,
+                        'fullName': user_name,
+                        'date': create_date,
+                        'durationTime': self.format_duration(duration),
+                        'taskDescription': description,
                     }
                     report_entries.append(report_data)
         return report_entries
@@ -35,10 +35,10 @@ class ClockifyReportGenerator:
 
             if "H" in duration:
                 hours, duration = duration.split("H")
-                hours += "H "
+                hours += "H"
             if "M" in duration:
                 minutes, duration = duration.split("M")
-                minutes += "M "
+                minutes += "M"
             if "S" in duration:
                 seconds, _ = duration.split("S")
                 seconds += "S"
