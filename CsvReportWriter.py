@@ -30,7 +30,7 @@ class CsvReportWriter(ReportWriter):
             print(file.name)
 
             for report_data in report_entries:
-                translated_data = {translated_fieldnames[i]: value for i, (key, value) in
+                translated_data = {translated_fieldnames[i]: value for i, (_, value) in
                                    enumerate(report_data.items())}
 
                 if tuple(translated_data.values()) not in existing_data:

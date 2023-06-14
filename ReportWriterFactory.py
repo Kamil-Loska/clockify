@@ -24,5 +24,4 @@ class ReportWriterFactory:
 
     def create_report_writer(self, output_format):
         report_writer_method = self.output_format.get(output_format)
-
         return report_writer_method()
