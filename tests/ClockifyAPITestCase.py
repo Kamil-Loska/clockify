@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import MagicMock, patch, Mock
+from unittest.mock import MagicMock, patch
 import pytest as pytest
 from ClockifyAPI import ClockifyAPI
 

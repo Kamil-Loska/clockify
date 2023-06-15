@@ -1,5 +1,5 @@
 import unittest
-
+from unittest.mock import MagicMock, patch
 
 from ConfigFileHandler import ConfigFileHandler
 
@@ -7,51 +7,49 @@ from ConfigFileHandler import ConfigFileHandler
 class ConfigFileHandlerTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.config_handler = ConfigFileHandler('mock_config.ini')
+        self.config_parser_mock = MagicMock()
+        self.config_parser_mock.get.return_value = '123Test'
+        self.config_parser_mock.__getitem__.return_value = {
+            'fullName': 'imieNazwisko',
+            'date': 'data',
+            'durationTime': 'czasTrwania',
+            'taskDescription': 'opisZadania'
+        }
+
+        with patch('configparser.ConfigParser', return_value=self.config_parser_mock):
+            self.config_handler = ConfigFileHandler('mock_config.ini')
 
     def test_get_workspace_id(self):
         result = self.config_handler.get_workspace_id()
-        expected_result = 'valid_id'
+        expected_result = '123Test'
         self.assertEqual(result, expected_result)
 
     def test_config_read(self):
         result = self.config_handler.config.get('Clockify', 'WORKSPACE_ID')
-        expected_result = 'valid_id'
+        expected_result = '123Test'
         self.assertEqual(result, expected_result)
 
     def test_translation_mapper(self):
         result = self.config_handler.translation_mapper()
         expected_result = {
-            'Fullname': 'Imie-i-nazwisko',
-            'Date': 'Data',
-            'Duration-time': 'Czas-trwania',
-            'Task-description': 'Opis-zadania'
+            'fullName': 'imieNazwisko',
+            'date': 'data',
+            'durationTime': 'czasTrwania',
+            'taskDescription': 'opisZadania'
         }
 
-        result_lower = {k.lower(): v for k, v in result.items()}
-        expected_result_lower = {k.lower(): v for k, v in expected_result.items()}
-
-        self.assertEqual(result_lower, expected_result_lower)
-
+        self.assertEqual(result, expected_result)
 
     def test_translation_mapper_invalid(self):
-        self.config_handler.config['FIELDINFO']['Fullname'] = 'Invalid Mapping'
+        self.config_parser_mock.__getitem__.return_value['fullName'] = 'Invalid Mapping'
 
         result = self.config_handler.translation_mapper()
 
         expected_result = {
-            'Fullname': 'Invalid Mapping',
-            'Date': 'Data',
-            'Duration-Time': 'Czas-trwania',
-            'Task-Description': 'Opis-zadania'
+            'fullName': 'Invalid Mapping',
+            'date': 'data',
+            'durationTime': 'czasTrwania',
+            'taskDescription': 'opisZadania'
         }
-        sorted_result = {k.title(): v for k, v in result.items()}
-        self.assertDictEqual(sorted_result, expected_result)
 
-
-
-
-
-
-
-
+        self.assertDictEqual(result, expected_result)

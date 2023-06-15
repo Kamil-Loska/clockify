@@ -1,41 +1,33 @@
 import unittest
 from unittest.mock import MagicMock
-
-from GenerateReportComposite import ReportComponent
-from ReportComposite import ReportComposite
+from ReportWriter import ReportWriter
+from CompositeReportWriter import ReportComposite
 
 
 class ReportCompositeTestCase(unittest.TestCase):
 
-    def test_generate_report_component(self):
-        mock_component = MagicMock(spec = ReportComponent)
-        mock_component.generate_report.return_value = {'data': 'Report 1'}
-        mock_component2 = MagicMock(spec =ReportComponent)
-        mock_component2.generate_report.return_value = {'data': 'Report 2'}
+    def setUp(self):
+        self.composite = ReportComposite()
+        self.mock_component1 = MagicMock(spec=ReportWriter)
+        self.mock_component2 = MagicMock(spec=ReportWriter)
+        self.report_entries = [{'data': 'Report 1'}, {'data': 'Report 2'}]
 
-
-        composite = ReportComposite()
-        composite.add_component(mock_component)
-        composite.add_component(mock_component2)
-
-        report_entries = composite.generate_report()
-
-        expected_report_entries = [{'data': 'Report 1'}, {'data': 'Report 2'}]
-        self.assertEqual(report_entries, expected_report_entries)
 
     def test_add_component(self):
+        self.composite.add_component(self.mock_component1)
 
-        mock_component = MagicMock(spec=ReportComponent)
-        composite = ReportComposite()
-        composite.add_component(mock_component)
-
-        self.assertIn(mock_component, composite.report_components)
+        self.assertIn(self.mock_component1, self.composite.report_components)
 
     def test_remove_component(self):
+        self.composite.add_component(self.mock_component1)
+        self.composite.remove_component(self.mock_component1)
 
-        mock_component = MagicMock(spec=ReportComponent)
-        composite = ReportComposite()
-        composite.add_component(mock_component)
-        composite.remove_component(mock_component)
+        self.assertNotIn(self.mock_component1, self.composite.report_components)
 
-        self.assertNotIn(mock_component, composite.report_components)
+    def test_write(self):
+        self.composite.add_component(self.mock_component1)
+        self.composite.add_component(self.mock_component2)
+        self.composite.write(self.report_entries)
+
+        self.mock_component1.write.assert_called_once_with(self.report_entries)
+        self.mock_component2.write.assert_called_once_with(self.report_entries)
