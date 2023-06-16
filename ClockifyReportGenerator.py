@@ -9,14 +9,13 @@ class ClockifyReportGenerator:
         for user_credentials in users:
             time_entries = self.clockify_api.get_time_entries_per_user(user_credentials, date_from, date_to)
             user_name = self.clockify_api.get_user_name(user_credentials)
-
             for data in time_entries:
                 create_date = data['timeInterval']['start'][:10]
                 duration = data['timeInterval']['duration']
                 description = data['description']
                 if description == "":
                     description = "In progress..."
-                if date_from <= date_to:
+                if date_from <= create_date <= date_to:
                     report_data = {
                         'fullName': user_name,
                         'date': create_date,

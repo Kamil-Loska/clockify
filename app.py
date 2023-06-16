@@ -5,7 +5,9 @@ from UsersFileHandler import UserHandler
 from ClockifyAPI import ClockifyAPI
 from ReportWriterFactory import ReportWriterFactory
 from CompositeReportWriter import ReportComposite
-
+from ConsoleReportWriter import ConsoleReportWriter
+from XmlReportWriter import XmlReportWriter
+from CsvReportWriter import CsvReportWriter
 
 def main():
     argument_provider = ArgumentProvider()
@@ -17,13 +19,16 @@ def main():
     clockify_generator = ClockifyReportGenerator(config_file_handler, clockify_api)
     report_entries = clockify_generator.generate_report(users, args.date_from, args.date_to)
 
-    report_writer_factory = ReportWriterFactory(config_file_handler)
+    report_writer_factory = ReportWriterFactory()
+    composite_writer = ReportComposite(report_writer_factory)
 
-    composite_writer = ReportComposite()
+    factory_creator = report_writer_factory.get_report_writer_type(args.output_format)
 
-    composite_writer.add_component(report_writer_factory.create_report_writer(args.output_format))
+    composite_writer.add_component(ConsoleReportWriter())
+    composite_writer.add_component(CsvReportWriter(config_file_handler))
+    composite_writer.add_component(XmlReportWriter())
 
-    composite_writer.write(report_entries)
+    composite_writer.write(report_entries, factory_creator)
 
 
 if __name__ == "__main__":
