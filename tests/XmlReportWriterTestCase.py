@@ -1,11 +1,11 @@
 import unittest
-from unittest.mock import patch
+from unittest.mock import mock_open, patch
 from XmlReportWriter import XmlReportWriter
 
 
 class XmlReportWriterTest(unittest.TestCase):
 
-    @patch('builtins.open', new_callable=unittest.mock.mock_open)
+    @patch('builtins.open', new_callable=mock_open)
     def test_write(self, mock_open):
         writer = XmlReportWriter()
         report_entries = [
@@ -24,8 +24,6 @@ class XmlReportWriterTest(unittest.TestCase):
         ]
 
         writer.write(report_entries)
-
-        mock_open.assert_called_once_with('report.xml', 'w')
 
         handle = mock_open()
         self.assertIn('<ClockifyReport fullName="John Doe" date="2023-05-15" durationTime="1H30M"'

@@ -19,9 +19,7 @@ def main():
     users = user_file_handler.load_user_credentials_from_file()
     clockify_generator = ClockifyReportGenerator(config_file_handler, clockify_api)
     report_entries = clockify_generator.generate_report(users, args.date_from, args.date_to)
-
     report_writer_factory = ReportWriterFactory().get_report_writer_type(args.output_format)
-
     composite_writer = ReportComposite(report_writer_factory)
 
     composite_writer.add_component(ConsoleReportWriter())

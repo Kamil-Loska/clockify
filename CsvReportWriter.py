@@ -10,7 +10,7 @@ class CsvReportWriter(ReportWriter):
     def write(self, report_entries):
         filename = 'report.csv'
         with open(filename, 'w', newline='', encoding='UTF8') as csvfile:
-            fieldnames = report_entries[0].keys()
+            fieldnames = list(report_entries[0].keys())
             translated_fieldnames = [self.config_handler.translation_mapper().get(fieldname, fieldname)
                                      for fieldname in fieldnames]
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)

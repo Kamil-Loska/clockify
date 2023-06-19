@@ -10,7 +10,7 @@ class UsersFileHandlerTestCase(unittest.TestCase):
         self.user_handler = UserHandler(self.test_file)
 
     def test_load_user_credentials_from_file(self):
-        users = list(self.user_handler.load_user_credentials_from_file())
+        users = self.user_handler.load_user_credentials_from_file()
         self.assertGreater(len(users), 0)
 
         with open(self.test_file, 'r') as file:

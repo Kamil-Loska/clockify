@@ -1,36 +1,26 @@
 import unittest
-from unittest.mock import patch, MagicMock
-from ReportWriterFactory import ReportWriterFactory
 from ConsoleReportWriter import ConsoleReportWriter
 from CsvReportWriter import CsvReportWriter
+from ReportWriterFactory import ReportWriterFactory
 from XmlReportWriter import XmlReportWriter
 
 
-class ReportWriterFactoryTest(unittest.TestCase):
+class TestReportWriterFactory(unittest.TestCase):
+    def setUp(self):
+        self.factory = ReportWriterFactory()
 
-    @patch.object(ConsoleReportWriter, '__init__', return_value=None)
-    def test_create_report_writer_console(self, mock_console_report_writer):
-        mock_config_handler = MagicMock()
-        factory = ReportWriterFactory(mock_config_handler)
-        factory.create_report_writer(ConsoleReportWriter)
-        mock_console_report_writer.assert_called_once()
+    def test_get_report_writer_type_console(self):
+        writer = self.factory.get_report_writer_type('console')
+        self.assertEqual(writer, ConsoleReportWriter)
 
-    @patch.object(CsvReportWriter, '__init__', return_value=None)
-    def test_create_report_writer_csv(self, mock_csv_report_writer):
-        mock_config_handler = MagicMock()
-        factory = ReportWriterFactory(mock_config_handler)
-        factory.create_report_writer(CsvReportWriter)
-        mock_csv_report_writer.assert_called_once_with(mock_config_handler)
+    def test_get_report_writer_type_csv(self):
+        writer = self.factory.get_report_writer_type('csv')
+        self.assertEqual(writer, CsvReportWriter)
 
-    @patch.object(XmlReportWriter, '__init__', return_value=None)
-    def test_create_report_writer_xml(self, mock_xml_report_writer):
-        mock_config_handler = MagicMock()
-        factory = ReportWriterFactory(mock_config_handler)
-        factory.create_report_writer(XmlReportWriter)
-        mock_xml_report_writer.assert_called_once()
+    def test_get_report_writer_type_xml(self):
+        writer = self.factory.get_report_writer_type('xml')
+        self.assertEqual(writer, XmlReportWriter)
 
-    def test_create_report_writer_invalid(self):
-        mock_config_handler = MagicMock()
-        factory = ReportWriterFactory(mock_config_handler)
-        result = factory.create_report_writer(None)
-        self.assertIsNone(result)
+    def test_get_report_writer_type_invalid(self):
+        with self.assertRaises(KeyError):
+            self.factory.get_report_writer_type('invalid')
