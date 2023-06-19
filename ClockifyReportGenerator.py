@@ -1,5 +1,6 @@
 
 class ClockifyReportGenerator:
+
     def __init__(self, config_handler, clockify_api):
         self.config_handler = config_handler
         self.clockify_api = clockify_api

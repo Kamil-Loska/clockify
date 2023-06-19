@@ -13,7 +13,7 @@ class ReportComposite(ReportWriter):
     def remove_component(self, component):
         self.report_components.remove(component)
 
-    def write(self, report_entries, report_writer):
+    def write(self, report_entries):
         for component in self.report_components:
-            if isinstance(component, report_writer):
+            if isinstance(component, self.factory):
                 component.write(report_entries)

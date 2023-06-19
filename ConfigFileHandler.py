@@ -12,6 +12,6 @@ class ConfigFileHandler:
         return self.config.get('Clockify', 'WORKSPACE_ID')
 
     def translation_mapper(self):
-        field_mappings = self.config['FIELDINFO']
+        field_mappings = self.config.get('FIELDINFO')
         translation_mapping = {key: value for key, value in field_mappings.items()}
         return translation_mapping

@@ -9,6 +9,7 @@ from ConsoleReportWriter import ConsoleReportWriter
 from XmlReportWriter import XmlReportWriter
 from CsvReportWriter import CsvReportWriter
 
+
 def main():
     argument_provider = ArgumentProvider()
     args = argument_provider.get_arguments()
@@ -19,16 +20,15 @@ def main():
     clockify_generator = ClockifyReportGenerator(config_file_handler, clockify_api)
     report_entries = clockify_generator.generate_report(users, args.date_from, args.date_to)
 
-    report_writer_factory = ReportWriterFactory()
-    composite_writer = ReportComposite(report_writer_factory)
+    report_writer_factory = ReportWriterFactory().get_report_writer_type(args.output_format)
 
-    factory_creator = report_writer_factory.get_report_writer_type(args.output_format)
+    composite_writer = ReportComposite(report_writer_factory)
 
     composite_writer.add_component(ConsoleReportWriter())
     composite_writer.add_component(CsvReportWriter(config_file_handler))
     composite_writer.add_component(XmlReportWriter())
 
-    composite_writer.write(report_entries, factory_creator)
+    composite_writer.write(report_entries)
 
 
 if __name__ == "__main__":
