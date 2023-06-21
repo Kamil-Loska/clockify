@@ -1,14 +1,13 @@
 from ClockifyReportGenerator import ClockifyReportGenerator
-from Argument_provider import ArgumentProvider
+from argument_provider import ArgumentProvider
 from ConfigFileHandler import ConfigFileHandler
 from UsersFileHandler import UserHandler
 from ClockifyAPI import ClockifyAPI
-from ReportWriterFactory import ReportWriterFactory
-from CompositeReportWriter import ReportComposite
+from ReportStrategyFactory import ReportStrategyFactory
+from ReportGenerator import ReportGenerator
 from ConsoleReportWriter import ConsoleReportWriter
 from XmlReportWriter import XmlReportWriter
 from CsvReportWriter import CsvReportWriter
-
 
 def main():
     argument_provider = ArgumentProvider()
@@ -19,14 +18,16 @@ def main():
     users = user_file_handler.load_user_credentials_from_file()
     clockify_generator = ClockifyReportGenerator(config_file_handler, clockify_api)
     report_entries = clockify_generator.generate_report(users, args.date_from, args.date_to)
-    report_writer_factory = ReportWriterFactory().get_report_writer_type(args.output_format)
-    composite_writer = ReportComposite(report_writer_factory)
 
-    composite_writer.add_component(ConsoleReportWriter())
-    composite_writer.add_component(CsvReportWriter(config_file_handler))
-    composite_writer.add_component(XmlReportWriter())
+    strategy_factory = ReportStrategyFactory(config_file_handler)
 
-    composite_writer.write(report_entries)
+    strategy = strategy_factory.get_strategy(args.output_format)
+
+    report_generator = ReportGenerator()
+
+    report_generator.strategy = ReportGenerator(strategy)
+
+    report_generator.write_report(report_entries)
 
 
 if __name__ == "__main__":

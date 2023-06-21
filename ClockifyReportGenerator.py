@@ -1,11 +1,13 @@
+from ClockifyAPI import ClockifyAPI
+from ConfigFileHandler import ConfigFileHandler
+from typing import List, Dict
 
 class ClockifyReportGenerator:
-
-    def __init__(self, config_handler, clockify_api):
+    def __init__(self, config_handler: ConfigFileHandler, clockify_api: ClockifyAPI):
         self.config_handler = config_handler
         self.clockify_api = clockify_api
 
-    def generate_report(self, users, date_from, date_to):
+    def generate_report(self, users: List[str], date_from: str, date_to: str) -> List[Dict[str, str]]:
         report_entries = []
         for user_credentials in users:
             time_entries = self.clockify_api.get_time_entries_per_user(user_credentials, date_from, date_to)
@@ -26,7 +28,7 @@ class ClockifyReportGenerator:
                     report_entries.append(report_data)
         return report_entries
 
-    def format_duration(self, duration):
+    def format_duration(self, duration: str) -> str:
         if duration is not None:
             duration = duration[2:]
             hours = ""

@@ -1,13 +1,13 @@
 import requests
-
+from typing import Dict, Any
 
 class ClockifyAPI:
 
-    def __init__(self, workspace_id):
+    def __init__(self, workspace_id: str):
         self.BASE_URL = 'https://api.clockify.me/api/v1/'
         self.workspace_id = workspace_id
 
-    def _send_get_request(self, api_key, endpoint, params=None):
+    def _send_get_request(self, api_key: str, endpoint: str, params: Dict[str, Any] = None):
         headers = {
             'X-Api-Key': api_key,
             'Content-Type': 'application/json'

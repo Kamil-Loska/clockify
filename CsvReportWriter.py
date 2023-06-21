@@ -1,13 +1,15 @@
 import csv
-from ReportWriter import ReportWriter
+from ReportStrategy import ReportStrategy
+from ConfigFileHandler import ConfigFileHandler
+from typing import List, Dict
 
 
-class CsvReportWriter(ReportWriter):
+class CsvReportWriter(ReportStrategy):
 
-    def __init__(self, config_handler):
+    def __init__(self, config_handler: ConfigFileHandler):
         self.config_handler = config_handler
 
-    def write(self, report_entries):
+    def write_report(self, report_entries: List[Dict[str, str]]):
         filename = 'report.csv'
         with open(filename, 'w', newline='', encoding='UTF8') as csvfile:
             fieldnames = list(report_entries[0].keys())
@@ -18,4 +20,5 @@ class CsvReportWriter(ReportWriter):
 
             for report_data in report_entries:
                 writer.writerow(report_data)
+
         print(csvfile.name)

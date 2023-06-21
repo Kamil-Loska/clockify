@@ -4,7 +4,7 @@ from datetime import datetime
 
 class ArgumentProvider:
 
-    def validate_date_format(self, date_from, date_to):
+    def validate_date_format(self, date_from: str, date_to: str) -> bool:
         try:
             datetime.strptime(date_from, '%Y-%m-%d')
             datetime.strptime(date_to, '%Y-%m-%d')
@@ -15,7 +15,7 @@ class ArgumentProvider:
         except ValueError:
             return False
 
-    def get_arguments(self):
+    def get_arguments(self) -> argparse.Namespace:
         parser = argparse.ArgumentParser(description='Generate Clockify report')
         parser.add_argument('--from', dest='date_from', required=True, help='Start date (YYYY-MM-DD)')
         parser.add_argument('--to', dest='date_to', required=True, help='End date (YYYY-MM-DD)')
