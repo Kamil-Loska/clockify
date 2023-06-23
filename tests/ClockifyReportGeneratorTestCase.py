@@ -14,19 +14,24 @@ class ClockifyReportGeneratorTest(unittest.TestCase):
         self.mock_user = {"API_KEY": "test_key", "User_ID": "test_user_id"}
 
     def test_generate_report_valid_data(self):
-        self.clockify_report_generator.clockify_api = self.clockify_api_mock
+        mock_clockify_api = MagicMock()
+        self.clockify_report_generator.clockify_api = mock_clockify_api
 
-        self.clockify_api_mock.get_user_name.return_value = "John Doe"
-        self.clockify_api_mock.get_time_entries_per_user.return_value = [
+        mock_clockify_api.get_user_name.return_value = "John Doe"
+        mock_clockify_api.get_time_entries_per_user.return_value = [
             {
                 'timeInterval': {'start': '2023-05-15T00:00:00Z', 'duration': 'PT1H'},
                 'description': 'Test 1',
+            },
+            {
+                'timeInterval': {'start': '2023-05-15T00:00:00Z', 'duration': 'PT2H'},
+                'description': '',
             },
         ]
 
         report = self.clockify_report_generator.generate_report(self.mock_user, '2023-05-01', '2023-05-31')
 
-        self.assertEqual(len(report), 2)
+        self.assertEqual(len(report), 4)
 
     def test_format_duration(self):
         duration = 'PT2H30M45S'
@@ -55,6 +60,7 @@ class ClockifyReportGeneratorTest(unittest.TestCase):
         self.assertEqual(formatted_duration, duration)
 
     def test_generate_report_with_missing_time_interval(self):
+        mock_config_handler = MagicMock()
         time_entries = [
             {
                 'timeInterval': {'start': '2023-05-15T09:00:00Z', 'duration': 'PT1H30M'},
@@ -64,5 +70,9 @@ class ClockifyReportGeneratorTest(unittest.TestCase):
 
         self.clockify_api_mock.get_time_entries_per_user.return_value = time_entries
         self.clockify_api_mock.get_user_name.return_value = 'John Doe'
-        result = self.clockify_report_generator.generate_report(self.mock_user, '2023-01-01', '2023-01-01')
+        report_generator = ClockifyReportGenerator(mock_config_handler, self.clockify_api_mock)
+        user_credentials = [{'User_ID': '123', 'API_KEY': 'API_KEY'}]
+        date_from = '2023-01-01'
+        date_to = '2023-01-01'
+        result = report_generator.generate_report(user_credentials, date_from, date_to)
         self.assertEqual(result, [])
