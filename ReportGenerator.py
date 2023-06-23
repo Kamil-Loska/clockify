@@ -18,5 +18,3 @@ class ReportGenerator:
 
     def write_report(self, report_entries: List[Dict[str, str]]):
         self.strategy.write_report(report_entries)
-
-

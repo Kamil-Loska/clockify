@@ -2,6 +2,7 @@ from ClockifyAPI import ClockifyAPI
 from ConfigFileHandler import ConfigFileHandler
 from typing import List, Dict
 
+
 class ClockifyReportGenerator:
     def __init__(self, config_handler: ConfigFileHandler, clockify_api: ClockifyAPI):
         self.config_handler = config_handler
