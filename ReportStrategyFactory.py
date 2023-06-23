@@ -8,10 +8,8 @@ class ReportStrategyFactory:
     def __init__(self, config_handler):
         self.config_handler = config_handler
 
-    def get_strategy(self, output_format: str) -> type:
-        strategies = {
-            'console': ConsoleReportWriter(),
-            'csv': CsvReportWriter(self.config_handler),
-            'xml': XmlReportWriter()
-        }
-        return strategies[output_format]
+    def get_strategy(self, output_format: str):
+        match output_format:
+            case 'console': return ConsoleReportWriter()
+            case 'csv': return CsvReportWriter(self.config_handler)
+            case 'xml': return XmlReportWriter()

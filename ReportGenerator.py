@@ -2,9 +2,10 @@ from __future__ import annotations
 from ReportStrategy import ReportStrategy
 from typing import List, Dict
 
+
 class ReportGenerator:
 
-    def __init__(self, strategy: ReportStrategy = None):
+    def __init__(self, strategy: ReportStrategy):
         self._strategy = strategy
 
     @property

@@ -18,14 +18,13 @@ class ClockifyReportGenerator:
                 description = data['description']
                 if description == "":
                     description = "In progress..."
-                if date_from <= create_date <= date_to:
-                    report_data = {
-                        'fullName': user_name,
-                        'date': create_date,
-                        'durationTime': self.format_duration(duration),
-                        'taskDescription': description,
-                    }
-                    report_entries.append(report_data)
+                report_data = {
+                    'fullName': user_name,
+                    'date': create_date,
+                    'durationTime': self.format_duration(duration),
+                    'taskDescription': description,
+                }
+                report_entries.append(report_data)
         return report_entries
 
     def format_duration(self, duration: str) -> str:
