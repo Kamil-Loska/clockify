@@ -17,8 +17,6 @@ class CsvReportWriter(ReportStrategy):
                                      for fieldname in fieldnames]
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writerow(dict(zip(fieldnames, translated_fieldnames)))
-
-            for report_data in report_entries:
-                writer.writerow(report_data)
+            writer.writerows(report_entries)
 
         print(csvfile.name)

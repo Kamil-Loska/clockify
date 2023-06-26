@@ -15,16 +15,16 @@ class TestReportWriterFactory(unittest.TestCase):
 
     def test_get_report_writer_type_console(self):
         writer = self.factory.get_strategy('console')
-        self.assertEqual(writer, ConsoleReportWriter)
+        self.assertIsInstance(writer, ConsoleReportWriter)
 
     def test_get_report_writer_type_csv(self):
         writer = self.factory.get_strategy('csv')
-        self.assertEqual(writer, CsvReportWriter)
+        self.assertIsInstance(writer, CsvReportWriter)
 
     def test_get_report_writer_type_xml(self):
         writer = self.factory.get_strategy('xml')
-        self.assertEqual(writer, XmlReportWriter)
+        self.assertIsInstance(writer, XmlReportWriter)
 
     def test_get_report_writer_type_invalid(self):
-        with self.assertRaises(KeyError):
-            self.factory.get_strategy('invalid')
+        writer = self.factory.get_strategy('invalid')
+        self.assertIsNone(writer)

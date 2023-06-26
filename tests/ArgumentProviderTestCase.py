@@ -1,7 +1,7 @@
 import argparse
 import unittest
 from unittest.mock import patch
-from argument_provider import ArgumentProvider
+from Argument_provider import ArgumentProvider
 
 
 class ArgumentProviderTestCase(unittest.TestCase):

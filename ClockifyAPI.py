@@ -1,6 +1,7 @@
 import requests
 from typing import Dict, Any
 
+
 class ClockifyAPI:
 
     def __init__(self, workspace_id: str):

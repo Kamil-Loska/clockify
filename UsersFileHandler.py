@@ -1,6 +1,7 @@
 import csv
 from typing import List
 
+
 class UserHandler:
 
     def __init__(self, user_file: str):
