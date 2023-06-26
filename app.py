@@ -16,7 +16,7 @@ def main():
     args = argument_provider.get_arguments()
     strategy_factory = ReportStrategyFactory(config_file_handler)
     strategy = strategy_factory.get_strategy(args.output_format)
-    clockify_generator = ClockifyReportGenerator(config_file_handler, clockify_api)
+    clockify_generator = ClockifyReportGenerator(clockify_api)
 
     report_entries = clockify_generator.generate_report(users, args.date_from, args.date_to)
     report_generator = ReportGenerator(strategy)

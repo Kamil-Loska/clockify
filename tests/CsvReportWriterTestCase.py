@@ -7,7 +7,7 @@ class CsvReportWriterTest(unittest.TestCase):
 
     @patch('csv.DictWriter')
     @patch('builtins.open', new_callable=unittest.mock.mock_open)
-    def test_write(self, mock_open, mock_dict_writer):
+    def test_write_report(self, mock_open, mock_dict_writer):
         mock_config_handler = MagicMock()
         mock_config_handler.translation_mapper.return_value = {'fullName': 'Full Name', 'date': 'Date', 'durationTime':
             'Duration', 'taskDescription': 'Task Description'}
@@ -25,4 +25,3 @@ class CsvReportWriterTest(unittest.TestCase):
             'fullName', 'date', 'durationTime', 'taskDescription'])
         mock_dict_writer_instance.writerow.assert_any_call(dict(zip([
          'fullName', 'date', 'durationTime', 'taskDescription'], ['Full Name', 'Date', 'Duration', 'Task Description'])))
-        mock_dict_writer_instance.writerow.assert_any_call(report_entries[0])

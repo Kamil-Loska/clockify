@@ -5,12 +5,18 @@ from ConsoleReportWriter import ConsoleReportWriter
 
 class ConsoleReportWriterTest(unittest.TestCase):
 
-    def setUp(self):
-        self.console_report_writer = ConsoleReportWriter()
-
     @patch('builtins.print')
-    def test_write(self, mock_print):
-        report_entries = [{'fullName': 'John Doe', 'date': '2023-05-15', 'durationTime': '1H30M',
-                           'taskDescription': 'Task 1'}]
-        self.console_report_writer.write_report(report_entries)
-        mock_print.assert_called_with(report_entries[0])
+    def test_write_report(self, mock_print):
+        writer = ConsoleReportWriter()
+        report_data = [
+            {'fullName': 'Mock Name 1', 'date': '2023-01-01', 'durationTime': '1H', 'taskDescription': 'Mock Task 1'},
+            {'fullName': 'Mock Name 2', 'date': '2023-01-02', 'durationTime': '2H', 'taskDescription': 'Mock Task 2'},
+        ]
+        writer.write_report(report_data)
+
+        expected_calls = [
+            unittest.mock.call('fullName,date,durationTime,taskDescription'),
+            unittest.mock.call('Mock Name 1,2023-01-01,1H,Mock Task 1'),
+            unittest.mock.call('Mock Name 2,2023-01-02,2H,Mock Task 2'),
+        ]
+        mock_print.assert_has_calls(expected_calls)

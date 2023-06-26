@@ -1,7 +1,5 @@
 import unittest
 from unittest.mock import MagicMock
-
-from ConfigFileHandler import ConfigFileHandler
 from ConsoleReportWriter import ConsoleReportWriter
 from CsvReportWriter import CsvReportWriter
 from ReportStrategyFactory import ReportStrategyFactory

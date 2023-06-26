@@ -4,8 +4,7 @@ from typing import List, Dict
 
 
 class ClockifyReportGenerator:
-    def __init__(self, config_handler: ConfigFileHandler, clockify_api: ClockifyAPI):
-        self.config_handler = config_handler
+    def __init__(self, clockify_api: ClockifyAPI):
         self.clockify_api = clockify_api
 
     def generate_report(self, users: List[str], date_from: str, date_to: str) -> List[Dict[str, str]]:
