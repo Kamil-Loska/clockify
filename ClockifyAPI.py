@@ -7,7 +7,7 @@ class ClockifyAPI:
         self.BASE_URL = 'https://api.clockify.me/api/v1/'
         self.workspace_id = workspace_id
 
-    def _send_get_request(self, api_key: str, endpoint: str, params: dict[str, any] = None):
+    def _send_get_request(self, api_key: str, endpoint: str, params: dict[str, str] = None):
         headers = {
             'X-Api-Key': api_key,
             'Content-Type': 'application/json'
@@ -37,7 +37,7 @@ class ClockifyAPI:
 
         return all_data
 
-    def get_user_name(self, api_key):
+    def get_user_name(self, api_key: dict[str]):
         endpoint = f'user'
         get_user_data = self._send_get_request(api_key['API_KEY'], endpoint)
         return get_user_data['name']

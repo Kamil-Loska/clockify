@@ -1,13 +1,15 @@
 import unittest
+from unittest.mock import MagicMock
+
 from ReportGenerator import ReportGenerator
-from tests.TestReportGenerator import TestReportGenerator
 
 
 class ReportGeneratorTest(unittest.TestCase):
     def setUp(self):
-        self.test_strategy = TestReportGenerator()
+        self.test_strategy = MagicMock()
         self.report_generator = ReportGenerator(self.test_strategy)
         self.report_data = [{'name': 'John Doe', 'time': '9:00'}]
+        self.test_strategy.write_report.return_value = self.report_data
 
     def test_strategy_property(self):
         self.assertEqual(self.report_generator.strategy, self.test_strategy)
@@ -17,7 +19,7 @@ class ReportGeneratorTest(unittest.TestCase):
         self.assertEqual(result, self.report_data)
 
     def test_set_strategy(self):
-        new_strategy = TestReportGenerator()
+        new_strategy = MagicMock()
         self.report_generator.strategy = new_strategy
         self.assertEqual(self.report_generator.strategy, new_strategy)
 
