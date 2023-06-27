@@ -28,19 +28,14 @@ class ClockifyReportGenerator:
     def format_duration(self, duration: str) -> str:
         if duration is not None:
             duration = duration[2:]
-            hours = ""
-            minutes = ""
-            seconds = ""
+            hours, minutes, seconds = 0, 0, 0
 
             if "H" in duration:
                 hours, duration = duration.split("H")
-                hours += "H"
             if "M" in duration:
                 minutes, duration = duration.split("M")
-                minutes += "M"
             if "S" in duration:
                 seconds, _ = duration.split("S")
-                seconds += "S"
 
-            formatted_duration = hours + minutes + seconds
+            formatted_duration = f"{int(hours):02d}:{int(minutes):02d}:{int(seconds):02d}"
             return formatted_duration.strip()
