@@ -1,6 +1,5 @@
 from __future__ import annotations
 from ReportStrategy import ReportStrategy
-from typing import List, Dict
 
 
 class ReportGenerator:
@@ -16,5 +15,5 @@ class ReportGenerator:
     def strategy(self, strategy: ReportStrategy):
         self._strategy = strategy
 
-    def write_report(self, report_entries: List[Dict[str, str]]):
+    def write_report(self, report_entries: list[dict[str, str]]):
         self.strategy.write_report(report_entries)

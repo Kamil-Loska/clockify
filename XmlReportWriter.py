@@ -1,11 +1,10 @@
 from xml.dom import minidom
 from ReportStrategy import ReportStrategy
-from typing import List, Dict
 
 
 class XmlReportWriter(ReportStrategy):
 
-    def write_report(self, report_entries: List[Dict[str, str]]) -> None:
+    def write_report(self, report_entries: list[dict[str, str]]) -> None:
         root = minidom.Document()
         xml = root.createElement('root')
         root.appendChild(xml)

@@ -1,5 +1,4 @@
 import requests
-from typing import Dict, Any
 
 
 class ClockifyAPI:
@@ -8,7 +7,7 @@ class ClockifyAPI:
         self.BASE_URL = 'https://api.clockify.me/api/v1/'
         self.workspace_id = workspace_id
 
-    def _send_get_request(self, api_key: str, endpoint: str, params: Dict[str, Any] = None):
+    def _send_get_request(self, api_key: str, endpoint: str, params: dict[str, any] = None):
         headers = {
             'X-Api-Key': api_key,
             'Content-Type': 'application/json'
@@ -19,7 +18,7 @@ class ClockifyAPI:
 
         return data
 
-    def get_time_entries_per_user(self, user_credentials, start_date, end_date):
+    def get_time_entries_per_user(self, user_credentials: dict[str], start_date: str, end_date: str):
         endpoint = f'workspaces/{self.workspace_id}/user/{user_credentials["User_ID"]}/time-entries'
         params = {
             'start': f'{start_date}T00:00:00Z',
