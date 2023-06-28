@@ -11,9 +11,5 @@ class ReportGenerator:
     def strategy(self) -> ReportStrategy:
         return self._strategy
 
-    @strategy.setter
-    def strategy(self, strategy: ReportStrategy):
-        self._strategy = strategy
-
     def write_report(self, report_entries: list[dict[str, str]]):
         self.strategy.write_report(report_entries)

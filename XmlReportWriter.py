@@ -20,4 +20,4 @@ class XmlReportWriter(ReportStrategy):
         save_to_file = 'report.xml'
         with open(save_to_file, 'w') as xmlFile:
             xmlFile.write(xml_str)
-        print(xmlFile.name)
+            print(xmlFile.name)

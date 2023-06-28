@@ -1,17 +1,14 @@
 import unittest
 from unittest.mock import MagicMock
 from ClockifyReportGenerator import ClockifyReportGenerator
-from ConfigFileHandler import ConfigFileHandler
 
 
 class ClockifyReportGeneratorTest(unittest.TestCase):
 
     def setUp(self):
-        self.config_handler = ConfigFileHandler('mock_config.ini')
-        self.config_handler_mock = MagicMock()
         self.clockify_api_mock = MagicMock()
-        self.clockify_report_generator = ClockifyReportGenerator(self.config_handler_mock, self.clockify_api_mock)
-        self.mock_user = {"API_KEY": "test_key", "User_ID": "test_user_id"}
+        self.clockify_report_generator = ClockifyReportGenerator(self.clockify_api_mock)
+        self.mock_user = [{"User_ID": "1", "API_KEY": "API_KEY"}]
 
     def test_generate_report_valid_data(self):
         self.clockify_api_mock.get_user_name.return_value = "John Doe"
@@ -26,33 +23,33 @@ class ClockifyReportGeneratorTest(unittest.TestCase):
             },
         ]
 
-        report = self.clockify_report_generator.generate_report([self.mock_user], '2023-05-01', '2023-05-31')
+        report = self.clockify_report_generator.generate_report(self.mock_user, '2023-05-01', '2023-05-31')
 
         self.assertEqual(len(report), 2)
 
     def test_format_duration(self):
         duration = 'PT2H30M45S'
         formatted_duration = self.clockify_report_generator.format_duration(duration)
-        self.assertEqual(formatted_duration, '2H30M45S')
+        self.assertEqual(formatted_duration, '02:30:45')
 
         duration = 'PT1H'
         formatted_duration = self.clockify_report_generator.format_duration(duration)
-        self.assertEqual(formatted_duration, '1H')
+        self.assertEqual(formatted_duration, '01:00:00')
 
         duration = 'PT45M'
         formatted_duration = self.clockify_report_generator.format_duration(duration)
-        self.assertEqual(formatted_duration, '45M')
+        self.assertEqual(formatted_duration, '00:45:00')
 
         duration = 'PT30S'
         formatted_duration = self.clockify_report_generator.format_duration(duration)
-        self.assertEqual(formatted_duration, '30S')
+        self.assertEqual(formatted_duration, '00:00:30')
 
         duration = 'PT'
         formatted_duration = self.clockify_report_generator.format_duration(duration)
-        self.assertEqual(formatted_duration, '')
+        self.assertEqual(formatted_duration, '00:00:00')
 
     def test_empty_format_duration(self):
-        duration = ''
+        duration = '00:00:00'
         formatted_duration = self.clockify_report_generator.format_duration(duration)
         self.assertEqual(formatted_duration, duration)
 
@@ -61,5 +58,5 @@ class ClockifyReportGeneratorTest(unittest.TestCase):
         time_entries = []
 
         self.clockify_api_mock.get_time_entries_per_user.return_value = time_entries
-        result = self.clockify_report_generator.generate_report([self.mock_user], '2023-05-01', '2023-05-31')
+        result = self.clockify_report_generator.generate_report(self.mock_user, '2023-05-01', '2023-05-31')
         self.assertEqual(result, [])

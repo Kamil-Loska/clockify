@@ -1,29 +1,26 @@
 import unittest
 from unittest.mock import MagicMock
-
 from ReportGenerator import ReportGenerator
+from ReportStrategy import ReportStrategy
 
 
 class ReportGeneratorTest(unittest.TestCase):
     def setUp(self):
-        self.test_strategy = MagicMock()
-        self.report_generator = ReportGenerator(self.test_strategy)
-        self.report_data = [{'name': 'John Doe', 'time': '9:00'}]
-        self.test_strategy.write_report.return_value = self.report_data
+        self.mock_strategy = MagicMock(spec=ReportStrategy)
+        self.report_generator = ReportGenerator(self.mock_strategy)
+        self.test_data = [
+            {"user_id": "user1", "date": "2023-06-20", "durationTime": "01:30:00"},
+            {"user_id": "user2", "date": "2023-06-20", "durationTime": "00:35:15"}
+        ]
 
     def test_strategy_property(self):
-        self.assertEqual(self.report_generator.strategy, self.test_strategy)
+        self.assertEqual(self.report_generator.strategy, self.mock_strategy)
 
-    def test_write_report(self):
-        result = self.report_generator.strategy.write_report(self.report_data)
-        self.assertEqual(result, self.report_data)
-
-    def test_set_strategy(self):
-        new_strategy = MagicMock()
-        self.report_generator.strategy = new_strategy
-        self.assertEqual(self.report_generator.strategy, new_strategy)
+    def test_call_correctly_write_report_method(self):
+        self.report_generator.write_report(self.test_data)
+        self.mock_strategy.write_report.assert_called_once_with(self.test_data)
 
     def test_write_report_no_strategy(self):
-        self.report_generator.strategy = None
+        report_generator = ReportGenerator(None)
         with self.assertRaises(AttributeError):
-            self.report_generator.write_report(self.report_data)
+            report_generator.write_report(self.test_data)

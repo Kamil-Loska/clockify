@@ -18,4 +18,4 @@ class CsvReportWriter(ReportStrategy):
             writer.writerow(dict(zip(fieldnames, translated_fieldnames)))
             writer.writerows(report_entries)
 
-        print(csvfile.name)
+            print(csvfile.name)

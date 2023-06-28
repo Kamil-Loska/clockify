@@ -1,3 +1,4 @@
+import csv
 import unittest
 from unittest.mock import patch, MagicMock
 from CsvReportWriter import CsvReportWriter
@@ -5,22 +6,21 @@ from CsvReportWriter import CsvReportWriter
 
 class CsvReportWriterTest(unittest.TestCase):
 
-    @patch('csv.DictWriter')
     @patch('builtins.open', new_callable=unittest.mock.mock_open)
-    def test_write_report(self, mock_open, mock_dict_writer):
+    @patch('csv.DictWriter.writerow')
+    @patch('csv.DictWriter.writerows')
+    def test_write_report(self, mock_writerows, mock_writerow, mock_open):
         mock_config_handler = MagicMock()
-        mock_config_handler.translation_mapper.return_value = {'fullName': 'Full Name', 'date': 'Date', 'durationTime':
+        mock_config_handler.translation_mapper.return_value = {'fullName': 'FullName', 'date': 'Date', 'durationTime':
             'Duration', 'taskDescription': 'Task Description'}
 
         writer = CsvReportWriter(mock_config_handler)
 
-        mock_dict_writer_instance = mock_dict_writer.return_value
-
         report_entries = [{'fullName': 'John Doe', 'date': '2023-05-15', 'durationTime': '1H30M', 'taskDescription': 'Task 1'}]
-
         writer.write_report(report_entries)
         mock_open.assert_called_once_with('report.csv', 'w', newline='', encoding='UTF8')
-        mock_dict_writer.assert_called_once_with(mock_open.return_value, fieldnames=[
-            'fullName', 'date', 'durationTime', 'taskDescription'])
-        mock_dict_writer_instance.writerow.assert_any_call(dict(zip([
-         'fullName', 'date', 'durationTime', 'taskDescription'], ['Full Name', 'Date', 'Duration', 'Task Description'])))
+
+        fieldnames = dict(zip(['fullName', 'date', 'durationTime', 'taskDescription'],
+                           ['FullName', 'Date', 'Duration', 'Task Description']))
+        mock_writerow.assert_called_once_with(fieldnames)
+        mock_writerows.assert_called_once_with(report_entries)
