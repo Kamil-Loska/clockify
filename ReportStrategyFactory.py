@@ -11,6 +11,6 @@ class ReportStrategyFactory:
 
     def get_strategy(self, output_format: str):
         match output_format:
-            case 'console': return ConsoleReportWriter()
+            case 'console': return ConsoleReportWriter(self.config_handler)
             case 'csv': return CsvReportWriter(self.config_handler)
             case 'xml': return XmlReportWriter()
