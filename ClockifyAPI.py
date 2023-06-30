@@ -16,7 +16,7 @@ class ClockifyAPI:
         url = self.BASE_URL + endpoint
         response = requests.get(url, headers=headers, params=params)
         if response.status_code >= 400:
-            raise Exception(f"Request failed - {response.status_code}")
+            raise Exception(f"Request failed - {response.status_code} Error code")
         data = response.json()
 
         return data

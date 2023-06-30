@@ -6,8 +6,7 @@ from ConfigFileHandler import ConfigFileHandler
 class CsvReportWriter(ReportStrategy):
 
     def __init__(self, config_handler: ConfigFileHandler):
-        self.config_handler = config_handler
-        self.translation_map = self.config_handler.translation_mapper()
+        self.translation_map = config_handler.translation_mapper()
 
     def write_report(self, report_entries: list[dict[str, str]]):
         filename = 'report.csv'
@@ -15,6 +14,7 @@ class CsvReportWriter(ReportStrategy):
             fieldnames = list(report_entries[0].keys())
             translated_fieldnames = [self.translation_map.get(fieldname, fieldname)
                                      for fieldname in fieldnames]
+
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writerow(dict(zip(fieldnames, translated_fieldnames)))
             writer.writerows(report_entries)

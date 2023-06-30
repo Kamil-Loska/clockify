@@ -1,4 +1,3 @@
-
 from ConsoleReportWriter import ConsoleReportWriter
 from XmlReportWriter import XmlReportWriter
 from CsvReportWriter import CsvReportWriter

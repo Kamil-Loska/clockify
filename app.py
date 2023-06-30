@@ -9,6 +9,7 @@ from ReportGenerator import ReportGenerator
 
 def main():
     config_file_handler = ConfigFileHandler('config.ini')
+
     user_file_handler = UserHandler('Users.csv')
     clockify_api = ClockifyAPI(config_file_handler.get_workspace_id())
     users = user_file_handler.load_user_credentials_from_file()

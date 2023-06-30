@@ -4,8 +4,7 @@ from ReportStrategy import ReportStrategy
 class ConsoleReportWriter(ReportStrategy):
 
     def __init__(self, config_handler):
-        self.config_handler = config_handler
-        self.translation_map = self.config_handler.translation_mapper()
+        self.translation_map = config_handler.translation_mapper()
 
     def write_report(self, report_data: list[dict[str, str]]):
         fieldnames = list(report_data[0].keys())

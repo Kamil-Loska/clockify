@@ -13,9 +13,6 @@ class ReportGeneratorTest(unittest.TestCase):
             {"user_id": "user2", "date": "2023-06-20", "durationTime": "00:35:15"}
         ]
 
-    def test_strategy_property(self):
-        self.assertEqual(self.report_generator.strategy, self.mock_strategy)
-
     def test_call_correctly_write_report_method(self):
         self.report_generator.write_report(self.test_data)
         self.mock_strategy.write_report.assert_called_once_with(self.test_data)

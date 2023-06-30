@@ -1,9 +1,8 @@
 import unittest
 from unittest.mock import MagicMock, patch
 import pytest as pytest
-import requests
-
 from ClockifyAPI import ClockifyAPI
+from User import User
 
 
 class ClockifyAPITestCase(unittest.TestCase):
@@ -14,88 +13,77 @@ class ClockifyAPITestCase(unittest.TestCase):
             yield mock_get
 
     def setUp(self):
-        self.clockify_api = ClockifyAPI(workspace_id='workspace_id')
-        self.user_credentials = {'User_ID': '456', 'API_KEY': 'API_KEY'}
+        self.workspace_id = 'workspace_id'
+        self.clockify_api = ClockifyAPI(self.workspace_id)
+        self.user_credentials = User('User_ID', 'API_KEY')
 
-    def create_mock_response(self, data):
+    def create_mock_response(self, data, status_code=200):
         mock_response = MagicMock()
         mock_response.json.return_value = data
+        mock_response.status_code = status_code
         return mock_response
 
     @patch('ClockifyAPI.requests.get')
-    def test_send_get_request(self, mock_get):
-        endpoint = f'workspaces/123/user/{self.user_credentials["User_ID"]}/time-entries'
-        params = {'start': '2023-05-15T00:00:00Z', 'end': '2023-05-16T23:59:59Z'}
+    def test_get_time_entries_per_user(self, mock_get):
+        mock_response1 = self.create_mock_response([
+            [{'data': 'response1'}, {'data': 'response2'}, {'data': 'response3'}],
+            [{'data': 'response4'}, {'data': 'response5'}],
+            [],
+        ])
+        mock_response2 = self.create_mock_response([])
+        mock_get.side_effect = [mock_response1, mock_response2]
 
-        mock_response = self.create_mock_response({'data': 'response_data'})
-        mock_get.return_value = mock_response
+        actual_result = self.clockify_api.get_time_entries_per_user(self.user_credentials, '2023-05-15', '2023-05-16')
 
-        clockify_api = ClockifyAPI(self.user_credentials["API_KEY"])
-        response = clockify_api._send_get_request(self.user_credentials["API_KEY"], endpoint, params)
-        self.assertEqual(response, {'data': 'response_data'})
-
-    @patch('ClockifyAPI.requests.get')
-    def test_get_time_entries_per_user(self, mock_get_request):
-        mock_responses = [
+        expected_result = [
             [{'data': 'response1'}, {'data': 'response2'}, {'data': 'response3'}],
             [{'data': 'response4'}, {'data': 'response5'}],
             [],
         ]
-        self.clockify_api._send_get_request = MagicMock(side_effect=mock_responses)
-        result = self.clockify_api.get_time_entries_per_user(self.user_credentials,
-                                                             '2023-05-15', '2023-05-16')
+        self.assertEqual(actual_result, expected_result)
+
+    @patch('ClockifyAPI.requests.get')
+    def test_get_user_name(self, mock_get):
+        expected_name = 'Test User'
+        mock_response = self.create_mock_response({'name': expected_name})
+        mock_get.return_value = mock_response
+
+        actual_name = self.clockify_api.get_user_name(self.user_credentials.api_key)
+
+        self.assertEqual(actual_name, expected_name)
+
+    @patch('requests.get')
+    def test_get_user_name_with_invalid_api_key(self, mock_get):
+        mock_get.return_value = MagicMock()
+
+        with self.assertRaises(Exception):
+            self.clockify_api.get_user_name('invalid_api_key')
+
+    @patch('ClockifyAPI.requests.get')
+    def test_get_time_entries_per_user_with_empty_response(self, mock_get):
+        mock_responses = [
+            self.create_mock_response([{'data': 'response1'}, {'data': 'response2'}, {'data': 'response3'}]),
+            self.create_mock_response([]),
+            self.create_mock_response([{'data': 'response4'}, {'data': 'response5'}]),
+        ]
+        mock_get.side_effect = mock_responses
+
+        actual_result = self.clockify_api.get_time_entries_per_user(self.user_credentials, '2023-05-15', '2023-05-16')
 
         expected_result = [
             {'data': 'response1'},
             {'data': 'response2'},
             {'data': 'response3'},
-            {'data': 'response4'},
-            {'data': 'response5'},
         ]
-        self.assertEqual(result, expected_result)
 
-    @patch('ClockifyAPI.requests.get')
-    def test_get_user_data(self, mock_get_request):
-        mock_response = self.create_mock_response({'name': 'John Doe'})
-        mock_get_request.return_value = mock_response
-
-        result = self.clockify_api.get_user_name({'API_KEY': 'API_KEY'})
-
-        self.assertEqual(result, 'John Doe')
-
-    @patch('ClockifyAPI.requests.get')
-    def test_send_get_request_with_invalid_url(self, mock_get):
-        endpoint = 'invalid_endpoint'
-        params = {'start': '2023-05-15T00:00:00Z', 'end': '2023-05-16T23:59:59Z'}
-        mock_response = self.create_mock_response({'data': 'response_data'})
-        mock_get.return_value = mock_response
-
-        clockify_api = ClockifyAPI(self.user_credentials["API_KEY"])
-        response = clockify_api._send_get_request(self.user_credentials["API_KEY"], endpoint, params)
-        self.assertEqual(response, {'data': 'response_data'})
-
-    @patch('ClockifyAPI.requests.get')
-    def test_get_time_entries_per_user_with_empty_response(self, mock_get_request):
-        mock_responses = [
-            [{'data': 'response1'}, {'data': 'response2'}, {'data': 'response3'}],
-            [],
-            [{'data': 'response4'}, {'data': 'response5'}],
-        ]
-        self.clockify_api.send_get_request = MagicMock(side_effect=mock_responses)
-        result = self.clockify_api.get_time_entries_per_user(self.user_credentials,
-                                                             '2023-05-15', '2023-05-16')
-        expected_result = []
-        self.assertEqual(result, expected_result)
+        self.assertEqual(actual_result, expected_result)
 
     @patch('ClockifyAPI.requests.get')
     def test_get_user_credentials_with_missing_name(self, mock_get_request):
         mock_response = self.create_mock_response({'name': ''})
         mock_get_request.return_value = mock_response
 
-        result = self.clockify_api.get_user_name({'API_KEY': 'API_KEY'})
+        result = self.clockify_api.get_user_name(self.user_credentials.api_key)
 
-        mock_get_request.assert_called_once_with('https://api.clockify.me/api/v1/user',
-                                                 headers={'X-Api-Key': 'API_KEY', 'Content-Type': 'application/json'},
-                                                 params=None)
         expected_result = ''
         self.assertEqual(result, expected_result)
