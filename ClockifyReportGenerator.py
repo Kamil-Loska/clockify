@@ -1,15 +1,16 @@
 from ClockifyAPI import ClockifyAPI
+from UsersFileHandler import User
 
 
 class ClockifyReportGenerator:
     def __init__(self, clockify_api: ClockifyAPI):
         self.clockify_api = clockify_api
 
-    def generate_report(self, users: list[dict[str, str]], date_from: str, date_to: str) -> list[dict[str, str]]:
+    def generate_report(self, users: list[User], date_from: str, date_to: str) -> list[dict[str, str]]:
         report_entries = []
-        for user_credentials in users:
-            time_entries = self.clockify_api.get_time_entries_per_user(user_credentials, date_from, date_to)
-            user_name = self.clockify_api.get_user_name(user_credentials)
+        for user in users:
+            time_entries = self.clockify_api.get_time_entries_per_user(user, date_from, date_to)
+            user_name = self.clockify_api.get_user_name(user.api_key)
             for data in time_entries:
                 create_date = data['timeInterval']['start'][:10]
                 duration = data['timeInterval']['duration']
@@ -36,6 +37,5 @@ class ClockifyReportGenerator:
                 minutes, duration = duration.split("M")
             if "S" in duration:
                 seconds, _ = duration.split("S")
-
             formatted_duration = f"{int(hours):02d}:{int(minutes):02d}:{int(seconds):02d}"
             return formatted_duration.strip()
