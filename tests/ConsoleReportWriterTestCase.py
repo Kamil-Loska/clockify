@@ -1,28 +1,41 @@
 import unittest
-from unittest import mock
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, call, patch
 from ConsoleReportWriter import ConsoleReportWriter
 
 
-class ConsoleReportWriterTest(unittest.TestCase):
+class TestConsoleReportWriter(unittest.TestCase):
+    def setUp(self):
+        self.mock_config_handler = MagicMock()
+        self.mock_config_handler.translation_mapper.return_value = {
+            'fullName': 'imieNazwisko',
+            'date': 'data',
+            'durationTime': 'czasTrwania',
+            'taskDescription': 'opisZadania'
+        }
+        self.writer = ConsoleReportWriter(self.mock_config_handler)
 
     @patch('builtins.print')
     def test_write_report(self, mock_print):
-        mock_config_handler = MagicMock()
-        mock_config_handler.translation_mapper.return_value = {'fullName': 'FullName', 'date': 'Date', 'durationTime':
-            'Duration', 'taskDescription': 'Task Description'}
-        writer = ConsoleReportWriter(mock_config_handler)
-
         report_data = [
-            {'fullName': 'Mock Name 1', 'date': '2023-05-15', 'durationTime': '01:00:00', 'taskDescription':
-                'Mock Task 1'},
-            {'fullName': 'Mock Name 2', 'date': '2023-05-15', 'durationTime': '02:45:15', 'taskDescription':
-                'Mock Task 2'},
+            {
+                'fullName': 'Mock Name 1',
+                'date': '2023-05-15',
+                'durationTime': '01:00:00',
+                'taskDescription': 'Mock Task 1'
+            },
+            {
+                'fullName': 'Mock Name 2',
+                'date': '2023-05-15',
+                'durationTime': '02:45:15',
+                'taskDescription': 'Mock Task 2'
+            }
         ]
-        writer.write_report(report_data)
+
+        self.writer.write_report(report_data)
 
         expected_calls = [
-            mock.call('Mock Name 1,2023-05-15,01:00:00,Mock Task 1'),
-            mock.call('Mock Name 2,2023-05-15,02:45:15,Mock Task 2'),
+            call('imieNazwisko,data,czasTrwania,opisZadania'),
+            call('Mock Name 1,2023-05-15,01:00:00,Mock Task 1'),
+            call('Mock Name 2,2023-05-15,02:45:15,Mock Task 2')
         ]
         mock_print.assert_has_calls(expected_calls)
