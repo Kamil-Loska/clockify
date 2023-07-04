@@ -26,8 +26,6 @@ class ConfigFileHandlerTestCase(unittest.TestCase):
             'taskDescription': 'opisZadania'
         }
 
-        self.config_parser_mock.__getitem__.return_value = expected_result
-
         result = self.config_handler.translation_mapper()
         self.assertEqual(result, expected_result)
 
@@ -37,8 +35,7 @@ class ConfigFileHandlerTestCase(unittest.TestCase):
             'date': 'data',
             'durationTime': 'czasTrwania',
             'taskDescription': 'opisZadania',
-            'position': 'UnknownPosition'
+            'position': 'UnknownPosition',
         }
-
         result = self.config_handler.translation_mapper()
         self.assertNotEquals(config_values, result)

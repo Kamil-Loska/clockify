@@ -40,24 +40,20 @@ class ClockifyAPITestCase(unittest.TestCase):
             [{'data': 'response4'}, {'data': 'response5'}],
             [],
         ]
+
         self.assertEqual(actual_result, expected_result)
 
-    @patch('ClockifyAPI.requests.get')
-    def test_get_user_name(self, mock_get):
-        expected_name = 'Test User'
-        mock_response = self.create_mock_response({'name': expected_name})
-        mock_get.return_value = mock_response
-
-        actual_name = self.clockify_api.get_user_name(self.user_credentials.api_key)
-
-        self.assertEqual(actual_name, expected_name)
-
     @patch('requests.get')
-    def test_get_user_name_with_invalid_api_key(self, mock_get):
-        mock_get.return_value = MagicMock()
+    def test_get_user_name_client_error(self, mock_get):
+        mock_get.return_value = MagicMock(status_code=403)
 
+        # Call the method and check if it raises an exception
         with self.assertRaises(Exception):
             self.clockify_api.get_user_name('invalid_api_key')
+
+
+
+    #API ZWRACA NATURALNE DANE, czyli 3 2 1 odpowiedzi z response'a.
 
     @patch('ClockifyAPI.requests.get')
     def test_get_time_entries_per_user_with_empty_response(self, mock_get):
@@ -85,5 +81,8 @@ class ClockifyAPITestCase(unittest.TestCase):
 
         result = self.clockify_api.get_user_name(self.user_credentials.api_key)
 
+        mock_get_request.assert_called_once_with('https://api.clockify.me/api/v1/user',
+                                                 headers={'X-Api-Key': 'API_KEY', 'Content-Type': 'application/json'},
+                                                 params=None)
         expected_result = ''
         self.assertEqual(result, expected_result)

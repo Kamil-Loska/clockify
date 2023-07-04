@@ -1,3 +1,4 @@
+import csv
 import unittest
 from unittest.mock import patch, MagicMock
 from CsvReportWriter import CsvReportWriter
