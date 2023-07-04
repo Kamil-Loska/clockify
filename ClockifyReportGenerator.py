@@ -19,6 +19,7 @@ class ClockifyReportGenerator:
                     description = "In progress..."
                 report_data = {
                     'fullName': user_name,
+                    'department': user.department,
                     'date': create_date,
                     'durationTime': self.format_duration(duration),
                     'taskDescription': description,
