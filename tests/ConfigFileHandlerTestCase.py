@@ -8,9 +8,7 @@ class ConfigFileHandlerTestCase(unittest.TestCase):
 
     def setUp(self):
         self.config_parser_mock = MagicMock(spec=ConfigParser)
-
         self.config_handler = ConfigFileHandler('mock_config.ini')
-        self.config_handler.config = self.config_parser_mock
 
     def test_get_workspace_id(self):
         self.config_parser_mock.get.return_value = '123Test'
@@ -19,21 +17,25 @@ class ConfigFileHandlerTestCase(unittest.TestCase):
         self.assertEqual(result, expected_result)
 
     def test_translation_mapper(self):
-        expected_result = {
+        expected_values = {
             'fullName': 'imieNazwisko',
+            'department': 'dzial',
             'date': 'data',
             'durationTime': 'czasTrwania',
             'taskDescription': 'opisZadania'
         }
-
-        self.config_parser_mock.__getitem__.return_value = expected_result
-
         result = self.config_handler.translation_mapper()
-        self.assertEqual(result, expected_result)
+
+        self.assertEqual(result['fullName'], expected_values['fullName'])
+        self.assertEqual(result['department'], expected_values['department'])
+        self.assertEqual(result['date'], expected_values['date'])
+        self.assertEqual(result['durationTime'], expected_values['durationTime'])
+        self.assertEqual(result['taskDescription'], expected_values['taskDescription'])
 
     def test_translation_mapper_ignores_unknown_field(self):
         config_values = {
             'fullName': 'imieNazwisko',
+            'departamnt': 'Support',
             'date': 'data',
             'durationTime': 'czasTrwania',
             'taskDescription': 'opisZadania',

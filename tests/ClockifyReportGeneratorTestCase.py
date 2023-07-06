@@ -9,7 +9,7 @@ class ClockifyReportGeneratorTest(unittest.TestCase):
     def setUp(self):
         self.clockify_api_mock = MagicMock()
         self.clockify_report_generator = ClockifyReportGenerator(self.clockify_api_mock)
-        self.mock_user = [User("1", "API_KEY")]
+        self.mock_user = [User("1", "API_KEY", "IT Security")]
 
     def test_generate_report_returns_expected_output_for_given_input(self):
         self.clockify_api_mock.get_user_name.return_value = "John Doe"
@@ -22,6 +22,7 @@ class ClockifyReportGeneratorTest(unittest.TestCase):
         expected_report = [
             {
                 'fullName': 'John Doe',
+                'department': 'IT Security',
                 'date': '2023-05-15',
                 'durationTime': '01:00:00',
                 'taskDescription': 'Test 1',

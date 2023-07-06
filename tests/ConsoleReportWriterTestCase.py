@@ -1,18 +1,14 @@
 import unittest
-from unittest.mock import MagicMock, call, patch
+from unittest.mock import call, patch
+
+from ConfigFileHandler import ConfigFileHandler
 from ConsoleReportWriter import ConsoleReportWriter
 
 
 class TestConsoleReportWriter(unittest.TestCase):
     def setUp(self):
-        self.mock_config_handler = MagicMock()
-        self.mock_config_handler.translation_mapper.return_value = {
-            'fullName': 'imieNazwisko',
-            'date': 'data',
-            'durationTime': 'czasTrwania',
-            'taskDescription': 'opisZadania'
-        }
-        self.writer = ConsoleReportWriter(self.mock_config_handler)
+        self.config_handler = ConfigFileHandler('mock_config.ini')
+        self.writer = ConsoleReportWriter(self.config_handler)
 
     @patch('builtins.print')
     def test_write_report(self, mock_print):
