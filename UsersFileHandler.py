@@ -11,7 +11,7 @@ class UserHandler:
         with open(self.user_file, 'r') as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
-                user = User(row['User_ID'], row['API_KEY'])
+                user = User(row['User_ID'], row['API_KEY'], row['Department'])
                 users.append(user)
 
         return users
