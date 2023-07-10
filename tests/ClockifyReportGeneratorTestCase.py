@@ -9,9 +9,9 @@ class ClockifyReportGeneratorTest(unittest.TestCase):
     def setUp(self):
         self.clockify_api_mock = MagicMock()
         self.clockify_report_generator = ClockifyReportGenerator(self.clockify_api_mock)
-        self.mock_user = [User("1", "API_KEY", "IT Security")]
+        self.mock_user = [User("1", "API_KEY")]
 
-    def test_generate_report_returns_expected_output_for_given_input(self):
+    def test_generate_report(self):
         self.clockify_api_mock.get_user_name.return_value = "John Doe"
         self.clockify_api_mock.get_time_entries_per_user.return_value = [
             {
@@ -22,7 +22,6 @@ class ClockifyReportGeneratorTest(unittest.TestCase):
         expected_report = [
             {
                 'fullName': 'John Doe',
-                'department': 'IT Security',
                 'date': '2023-05-15',
                 'durationTime': '01:00:00',
                 'taskDescription': 'Test 1',
@@ -75,7 +74,7 @@ class ClockifyReportGeneratorTest(unittest.TestCase):
         formatted_duration = self.clockify_report_generator.format_duration(duration)
         self.assertEqual(formatted_duration, '00:00:00')
 
-    def test_generate_report_with_missing_time_interval(self):
+    def test_generate_report_missing_entries(self):
         self.clockify_api_mock.get_user_name.return_value = "John Doe"
         time_entries = []
 

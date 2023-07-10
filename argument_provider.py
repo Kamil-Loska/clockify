@@ -1,5 +1,5 @@
 import argparse
-from datetime import datetime
+from datetime import datetime, date
 
 
 class ArgumentProvider:
@@ -8,8 +8,12 @@ class ArgumentProvider:
         try:
             datetime.strptime(date_from, '%Y-%m-%d')
             datetime.strptime(date_to, '%Y-%m-%d')
-            if date_from > date_to:
+            today_date = date.today().isoformat()
+            if date_from >= date_to:
                 print("First date can't be greater than second date")
+                return False
+            if (date_to or date_from) >= today_date:
+                print("Date can't be greater than today's date")
                 return False
             return True
         except ValueError:

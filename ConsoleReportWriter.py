@@ -1,15 +1,15 @@
 from ReportStrategy import ReportStrategy
+from FieldMapper import FieldMapper
 
 
 class ConsoleReportWriter(ReportStrategy):
 
     def __init__(self, config_handler):
-        self.translation_map = config_handler.translation_mapper()
+        self.field_mapper = FieldMapper(config_handler)
 
     def write_report(self, report_data: list[dict[str, str]]):
-        fieldnames = list(report_data[0].keys())
-        translated_fieldnames = [self.translation_map.get(fieldname, fieldname)
-                                 for fieldname in fieldnames]
-        print(','.join(translated_fieldnames))
-        for data in report_data:
+        mapped_report_data = list(self.field_mapper.map_fields(report_data))
+        fieldnames = mapped_report_data[0].keys()
+        print(','.join(fieldnames))
+        for data in mapped_report_data:
             print(','.join(data.values()))

@@ -24,5 +24,5 @@ class TestReportWriterFactory(unittest.TestCase):
         self.assertIsInstance(writer, XmlReportWriter)
 
     def test_get_report_writer_type_invalid(self):
-        writer = self.factory.get_strategy('invalid')
-        self.assertIsNone(writer)
+        with self.assertRaises(ValueError):
+            self.factory.get_strategy('invalid')

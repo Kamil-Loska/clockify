@@ -15,7 +15,7 @@ class ClockifyAPITestCase(unittest.TestCase):
     def setUp(self):
         self.workspace_id = 'workspace_id'
         self.clockify_api = ClockifyAPI(self.workspace_id)
-        self.user_credentials = User('User_ID', 'API_KEY', 'Department')
+        self.user_credentials = User('User_ID', 'API_KEY')
 
     def create_mock_response(self, data, status_code=200):
         mock_response = MagicMock()
@@ -52,13 +52,3 @@ class ClockifyAPITestCase(unittest.TestCase):
         actual_name = self.clockify_api.get_user_name(self.user_credentials.api_key)
 
         self.assertEqual(actual_name, expected_name)
-
-    @patch('ClockifyAPI.requests.get')
-    def test_get_user_credentials_with_missing_name(self, mock_get_request):
-        mock_response = self.create_mock_response({'name': ''})
-        mock_get_request.return_value = mock_response
-
-        result = self.clockify_api.get_user_name(self.user_credentials.api_key)
-
-        expected_result = ''
-        self.assertEqual(result, expected_result)

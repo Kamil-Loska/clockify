@@ -13,3 +13,4 @@ class ReportStrategyFactory:
             case 'console': return ConsoleReportWriter(self.config_handler)
             case 'csv': return CsvReportWriter(self.config_handler)
             case 'xml': return XmlReportWriter()
+            case _: raise ValueError(f"Unknown strategy: {output_format}")

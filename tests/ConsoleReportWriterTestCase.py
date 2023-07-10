@@ -1,6 +1,5 @@
 import unittest
 from unittest.mock import call, patch
-
 from ConfigFileHandler import ConfigFileHandler
 from ConsoleReportWriter import ConsoleReportWriter
 

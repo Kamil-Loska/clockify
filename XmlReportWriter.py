@@ -11,13 +11,11 @@ class XmlReportWriter(ReportStrategy):
         for report_data in report_entries:
             product_child = root.createElement('ClockifyReport')
             product_child.setAttribute('fullName', f'{report_data["fullName"]}')
-            product_child.setAttribute('department', f'{report_data["department"]}')
             product_child.setAttribute('date', f'{report_data["date"]}')
             product_child.setAttribute('durationTime', f'{report_data["durationTime"]}')
             product_child.setAttribute('taskDescription', f'{report_data["taskDescription"]}')
             xml.appendChild(product_child)
 
-        # default value of topprettyxml is indent='\t'
         xml_str = root.toprettyxml()
         save_to_file = 'report.xml'
         with open(save_to_file, 'w') as xmlFile:
