@@ -1,22 +1,18 @@
 import csv
 from ReportStrategy import ReportStrategy
-from ConfigFileHandler import ConfigFileHandler
-from FieldMapper import FieldMapper
 
 
 class CsvReportWriter(ReportStrategy):
 
-    def __init__(self, config_handler: ConfigFileHandler):
-        self.field_mapper = FieldMapper(config_handler)
+    def __init__(self, field_mapper):
+        self.field_mapper = field_mapper
 
     def write_report(self, report_entries: list[dict[str, str]]):
         filename = 'report.csv'
         with open(filename, 'w', newline='', encoding='UTF8') as csvfile:
-            mapped_report_data = list(self.field_mapper.map_fields(report_entries))
-            fieldnames = mapped_report_data[0].keys()
-
+            fieldnames = report_entries[0].keys()
+            translated_fieldnames = next(self.field_mapper.map_fields(report_entries))
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-            writer.writeheader()
-            writer.writerows(mapped_report_data)
-
+            writer.writerow(dict(zip(fieldnames, translated_fieldnames)))
+            writer.writerows(report_entries)
             print(csvfile.name)

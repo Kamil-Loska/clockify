@@ -19,6 +19,11 @@ class FieldMapperTestCase(unittest.TestCase):
         expected_report_data = [{'imieNazwisko': 'John Doe', 'data': '2023-05-15'}]
         self.assertEqual(mapped_report_data, expected_report_data)
 
+    def test_map_fields_with_unknown_field(self):
+        report_data = [{'fullName': 'John Doe', 'date': '2023-05-15', 'undefinedField': 'testValue'}]
+        result = list(self.field_mapper.map_fields(report_data))
+
+        self.assertEqual(result, [{'imieNazwisko': 'John Doe', 'data': '2023-05-15', 'undefinedField': 'testValue'}])
 
 
 

@@ -2,12 +2,14 @@ import unittest
 from unittest.mock import call, patch
 from ConfigFileHandler import ConfigFileHandler
 from ConsoleReportWriter import ConsoleReportWriter
+from FieldMapper import FieldMapper
 
 
 class TestConsoleReportWriter(unittest.TestCase):
     def setUp(self):
         self.config_handler = ConfigFileHandler('mock_config.ini')
-        self.writer = ConsoleReportWriter(self.config_handler)
+        self.field_mapper = FieldMapper(self.config_handler)
+        self.writer = ConsoleReportWriter(self.field_mapper)
 
     @patch('builtins.print')
     def test_write_report(self, mock_print):

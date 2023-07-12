@@ -1,5 +1,4 @@
 import unittest
-from unittest.mock import patch
 from UsersFileHandler import UserHandler
 
 
@@ -21,10 +20,7 @@ class UsersFileHandlerTestCase(unittest.TestCase):
         self.assertEqual(second_user.user_id, '2')
         self.assertEqual(second_user.api_key, 'key_2')
 
-    @patch('csv.DictReader')
-    def test_load_user_credentials_from_file_without_data(self, mock_dict_reader):
-        mock_data = []
-        mock_dict_reader.return_value = mock_data
-
-        result = self.user_handler.load_user_credentials_from_file()
-        self.assertEqual(result, mock_data)
+    def test_file_non_exists(self):
+        user_handler = UserHandler('test_user.csv')
+        with self.assertRaises(FileNotFoundError):
+            user_handler.load_user_credentials_from_file()

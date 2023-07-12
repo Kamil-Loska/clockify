@@ -10,11 +10,9 @@ class ArgumentProvider:
             datetime.strptime(date_to, '%Y-%m-%d')
             today_date = date.today().isoformat()
             if date_from >= date_to:
-                print("First date can't be greater than second date")
-                return False
+                raise Exception("First date can't be greater than second date")
             if (date_to or date_from) >= today_date:
-                print("Date can't be greater than today's date")
-                return False
+                raise Exception("Date can't be greater than today's date")
             return True
         except ValueError:
             return False

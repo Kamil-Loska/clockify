@@ -1,5 +1,6 @@
 import sys
 import unittest
+from datetime import date, timedelta
 from unittest.mock import patch
 from Argument_provider import ArgumentProvider
 
@@ -31,3 +32,17 @@ class ArgumentProviderTestCase(unittest.TestCase):
         args = argument_provider.get_arguments()
         self.assertEqual(args.output_format, 'console')
         mock_error.assert_not_called()
+
+    def test_first_date_greater_than_second(self):
+        first_date = '2023-06-01'
+        second_date = '2023-05-15'
+        with self.assertRaises(Exception):
+            argument_provider = ArgumentProvider()
+            argument_provider.validate_date_format(first_date, second_date)
+
+    def test_date_validation_error_for_future_dates(self):
+        today = date.today().isoformat()
+        tomorrow = (date.today() + timedelta(days=1)).isoformat()
+        with self.assertRaises(Exception):
+            argument_provider = ArgumentProvider()
+            argument_provider.validate_date_format(today, tomorrow)
