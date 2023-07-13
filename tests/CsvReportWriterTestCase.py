@@ -50,17 +50,3 @@ class CsvReportWriterTest(unittest.TestCase):
         mock_open.assert_called_once_with('report.csv', 'w', newline='', encoding='UTF8')
         self.assertEqual(['imieNazwisko', 'data', 'czasTrwania', 'opisZadania', 'position'],
                          list(mapped_report_data[0].keys()))
-
-    def test_writer_report_headers(self):
-        report_entries = [
-            {'fullName': 'John Doe', 'date': '2023-05-15', 'durationTime': '1H30M',
-             'taskDescription': 'Task 1'}]
-
-        expected_mapped_data = [
-            {'imieNazwisko': 'John Doe', 'data': '2023-05-15', 'czasTrwania': '1H30M',
-            'opisZadania': 'Task 1'}
-        ]
-
-        mapped_report_data = list(self.field_mapper.map_fields(report_entries))
-        expected_headers = expected_mapped_data[0].keys()
-        self.assertEqual(expected_headers, mapped_report_data[0].keys())
