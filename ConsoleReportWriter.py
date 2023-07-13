@@ -1,9 +1,10 @@
+from FieldMapper import FieldMapper
 from ReportStrategy import ReportStrategy
 
 
 class ConsoleReportWriter(ReportStrategy):
 
-    def __init__(self, field_mapper):
+    def __init__(self, field_mapper: FieldMapper):
         self.field_mapper = field_mapper
 
     def write_report(self, report_data: list[dict[str, str]]):

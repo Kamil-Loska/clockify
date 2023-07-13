@@ -8,7 +8,7 @@ class ClockifyAPI:
         self.BASE_URL = 'https://api.clockify.me/api/v1/'
         self.workspace_id = workspace_id
 
-    def _send_get_request(self, api_key: str, endpoint: str, params: dict[str, str] = None):
+    def _send_get_request(self, api_key: str, endpoint: str, params: dict[str, str] = None) -> list[dict[str, str]]:
         headers = {
             'X-Api-Key': api_key,
             'Content-Type': 'application/json'
@@ -18,10 +18,9 @@ class ClockifyAPI:
         if response.status_code >= 400:
             raise Exception(f"Request failed - {response.status_code} Error code")
         data = response.json()
-
         return data
 
-    def get_time_entries_per_user(self, user: User, start_date: str, end_date: str):
+    def get_time_entries_per_user(self, user: User, start_date: str, end_date: str) -> list[dict[str, str]]:
         endpoint = f'workspaces/{self.workspace_id}/user/{user.user_id}/time-entries'
         params = {
             'start': f'{start_date}T00:00:00Z',
@@ -37,10 +36,9 @@ class ClockifyAPI:
                 break
             all_data.extend(response)
             page += 1
-
         return all_data
 
-    def get_user_name(self, api_key: str):
+    def get_user_name(self, api_key: str) -> str:
         endpoint = f'user'
         get_user_data = self._send_get_request(api_key, endpoint)
         return get_user_data['name']

@@ -1,10 +1,12 @@
 import csv
+
+from FieldMapper import FieldMapper
 from ReportStrategy import ReportStrategy
 
 
 class CsvReportWriter(ReportStrategy):
 
-    def __init__(self, field_mapper):
+    def __init__(self, field_mapper: FieldMapper):
         self.field_mapper = field_mapper
 
     def write_report(self, report_entries: list[dict[str, str]]):

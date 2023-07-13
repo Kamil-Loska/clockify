@@ -1,12 +1,12 @@
 from ConsoleReportWriter import ConsoleReportWriter
+from FieldMapper import FieldMapper
 from XmlReportWriter import XmlReportWriter
 from CsvReportWriter import CsvReportWriter
 
 
 class ReportStrategyFactory:
 
-    def __init__(self, config_handler, field_mapper):
-        self.config_handler = config_handler
+    def __init__(self, field_mapper: FieldMapper):
         self.field_mapper = field_mapper
 
     def get_strategy(self, output_format: str):

@@ -17,7 +17,7 @@ def main():
     argument_provider = ArgumentProvider()
     args = argument_provider.get_arguments()
     field_mapper = FieldMapper(config_file_handler)
-    strategy_factory = ReportStrategyFactory(config_file_handler, field_mapper)
+    strategy_factory = ReportStrategyFactory(field_mapper)
     strategy = strategy_factory.get_strategy(args.output_format)
     clockify_generator = ClockifyReportGenerator(clockify_api)
 

@@ -4,7 +4,7 @@ from ReportStrategy import ReportStrategy
 
 class XmlReportWriter(ReportStrategy):
 
-    def write_report(self, report_entries: list[dict[str, str]]) -> None:
+    def write_report(self, report_entries: list[dict[str, str]]):
         root = minidom.Document()
         xml = root.createElement('root')
         root.appendChild(xml)
