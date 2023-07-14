@@ -2,7 +2,7 @@ import sys
 import unittest
 from datetime import date, timedelta
 from unittest.mock import patch
-from Argument_provider import ArgumentProvider
+from argument_provider import ArgumentProvider
 
 
 class ArgumentProviderTestCase(unittest.TestCase):
@@ -16,14 +16,11 @@ class ArgumentProviderTestCase(unittest.TestCase):
         self.assertEqual(args.date_to, '2023-05-16')
         mock_error.assert_not_called()
 
-    @patch('argparse.ArgumentParser.error')
-    def test_argument_parser_error_called(self, mock_error):
+    def test_argument_parser_error_called(self):
         sys.argv = ['app.py', '--from=2023-05-', '--to=2023-05-', '--format=console']
         argument_provider = ArgumentProvider()
-        args = argument_provider.get_arguments()
-        self.assertEqual(args.date_from, '2023-05-')
-        self.assertEqual(args.date_to, '2023-05-')
-        mock_error.assert_called()
+        with self.assertRaises(ValueError):
+            argument_provider.get_arguments()
 
     @patch('argparse.ArgumentParser.error')
     def test_format_default_value(self, mock_error):

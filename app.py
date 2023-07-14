@@ -1,5 +1,5 @@
 from ClockifyReportGenerator import ClockifyReportGenerator
-from Argument_provider import ArgumentProvider
+from argument_provider import ArgumentProvider
 from ConfigFileHandler import ConfigFileHandler
 from FieldMapper import FieldMapper
 from UsersFileHandler import UserHandler

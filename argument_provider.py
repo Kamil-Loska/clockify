@@ -4,18 +4,14 @@ from datetime import datetime, date
 
 class ArgumentProvider:
 
-    def validate_date_format(self, date_from: str, date_to: str) -> bool:
-        try:
-            datetime.strptime(date_from, '%Y-%m-%d')
-            datetime.strptime(date_to, '%Y-%m-%d')
-            today_date = date.today().isoformat()
-            if date_from >= date_to:
-                raise Exception("First date can't be greater than second date")
-            if (date_to or date_from) >= today_date:
-                raise Exception("Date can't be greater than today's date")
-            return True
-        except ValueError:
-            return False
+    def validate_date_format(self, date_from: str, date_to: str):
+        datetime.strptime(date_from, '%Y-%m-%d')
+        datetime.strptime(date_to, '%Y-%m-%d')
+        today_date = date.today().isoformat()
+        if date_from >= date_to:
+            raise Exception("First date can't be greater than second date")
+        if (date_to or date_from) >= today_date:
+            raise Exception("Date can't be greater than today's date")
 
     def get_arguments(self) -> argparse.Namespace:
         parser = argparse.ArgumentParser(description='Generate Clockify report')
@@ -24,7 +20,5 @@ class ArgumentProvider:
         parser.add_argument('--format', dest='output_format', required=False, help='Output format (CSV | XML | Console)',
                             default='console', choices=['csv', 'xml', 'console'])
         args = parser.parse_args()
-        if not self.validate_date_format(args.date_from, args.date_to):
-            parser.error("Invalid date format! Please provide dates in YYYY-MM-DD format.")
-
+        self.validate_date_format(args.date_from, args.date_to)
         return args
